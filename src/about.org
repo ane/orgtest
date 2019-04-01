@@ -1,0 +1,31 @@
+#+TITLE: Hello!
+#+OPTIONS: html-preamble:nil
+
+#+BEGIN_float-sm-right 
+#+BEGIN_ml-sm-5
+#+ATTR_HTML: :width 200 :class img-thumbnail
+[[file:assets/images/me.png]] 
+#+END_ml-sm-5
+#+END_float-sm-right
+
+Hi, my name is Antoine. I'm a professional software engineer living in
+Jyväskylä, Finland. I work as a software architect at [[http://www.qvantel.com][Qvantel]], building software
+in the telecom sector.
+
+I've been programming since childhood. I started my programming journey with
+games in the mid-90s and gradually moved to desktop software and web
+applications as the latter platform emerged. I've also done a lot of user
+interface design for desktop and web applications during that time.
+
+These past years I've also worked with designing large-scale software systems,
+focusing on software architecture, information modelling, software
+productization, and product engineering. My day job lets me also spend a
+significant time in programming, a craft that I've always loved.
+
+This blog is my voice on the web, it contains various writings about topics that
+interest me. Most likely such writings have something to do with computers and
+software. If you're interested in how I built this site, there is now [[file:posts/emacs-and-org.org][long
+article]] about it now.
+
+If you have any questions, you can reach me via [[mailto:ane@iki.fi][email]] or [[http://twitter.com/anewtf][Twitter]].
+

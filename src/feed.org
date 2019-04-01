@@ -1,0 +1,20 @@
+#+TITLE: Feed
+
+* [[file:/Users/akalmbach/code/kakka/src/posts/emacs-and-org.org][Using Emacs and Org to publish a blog]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/emacs-and-org.html
+:PUBDATE:  2019-03-20
+:ID:       36A7AB3E-BD93-4FFF-B396-BA670CF47FDB
+:END:
+* [[file:/Users/akalmbach/code/kakka/src/posts/configuration.org][Configurability]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/configuration.html
+:PUBDATE:  2019-03-14
+:ID:       8E1CADA3-8390-473B-8C7F-ED2BE13E9D8E
+:END:
+* [[file:/Users/akalmbach/code/kakka/src/posts/pieru.org][Shit head]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/pieru.html
+:PUBDATE:  2019-03-10
+:ID:       1F58579B-C84D-4FC7-8405-C04297ADC8E0
+:END:

@@ -1,0 +1,395 @@
+#+TITLE: Using Emacs and Org to publish a blog
+#+SUBTITLE: I converted my blog from Jekyll to be published using Emacs and Org. To say it was an interesting endeavor is an understatement.
+#+DATE: <2019-03-20>
+#+OPTIONS: ^:nil
+
+Wiring up your own static site creator could be seen as a rite of passage for
+the modern programmer. The ultimate [[http://catb.org/jargon/html/Y/yak-shaving.html][yak shave]], I ended up redoing the static
+site generation engine for this blog using [[https://orgmode.org/][Org mode.]] Org is an [[https://www.gnu.org/software/emacs/][Emacs]] package for
+many, many things. One of these is [[https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][publishing HTML pages]], so it can be used to
+generate static HTML sites. This document details the process I went through
+doing the conversion, and explains the background and reasoning for them.
+
+#+TOC: headlines 3
+
+* On markup formats
+
+Some people prefer to edit and publish blog posts using some sort of WYSIWYG
+editor, such as Wordpress or Blogger. I find editing raw documents using markup
+much more interesting. I want to have as much control as possible when authoring
+documents for the web. Already in university working on my [[https://jyx.jyu.fi/handle/123456789/44048?locale-attribute=en][Master's thesis]] I
+probably spent as much time formatting the $\LaTeX$ output as I spent on writing
+content or research. 
+
+While WYSIWYG undoubtedly is the most intuitive way to process documents for the
+human mind, it has its problems. While I doubt anyone is able to render $\TeX$ or
+HTML /in their head/, WYSIWYG sometimes gets in your way and its usability
+limits the customization of the output. This is why I prefer markup formats
+instead of using word processors or WYSIWYG HTML generators.
+
+However, markup languages are a pandora's box of their own: there are dozens of
+formats, and there are dozens of static site generators supporting each
+multitudes of markup formats, creating an enormous amount of combinations of
+engine and markup language.
+
+Turns out, not all markup languages are equal.
+
+** The quest for proper markup
+
+There are dozens and dozens of markup languages out there, but only few satisfy
+my needs. Markdown is of course the bare minimum with its unobtrusive syntax,
+but as one starts requiring more advanced features, it can no longer keep up.
+
+So, without further ado, here are things I absolutely require from a markup
+language for writing blog posts or technical documents:
+
+- Cross referencing :: I need to /easily/ create inline anchors and
+     cross-reference them using links that automatically generate a link, so
+     that if I add an anchor to a heading, and update its title, the change is
+     reflected at the link site. 
+- PlantUML, graphviz, etc. support :: The ability to embed graphviz source code
+     to generate graphs and images inline is a really nice thing to have.
+- Table of contents :: A no-brainer. Long posts like these require a table of
+     contents to make reading the text easier.
+- LaTeX support :: Sometimes I need to print some math, so LaTeX via MathJax is
+                   a must have.
+- Inline HTML and CSS :: Markups have their limits. Sometimes you need to add
+     raw HTML to get what you want, and this has to be as lightweight as
+     possible.
+     
+So after reviewing multiple formats, I narrowed it down to four:
+
+- [[https://github.github.com/gfm/][Github Flavored Markdown]]
+- [[https://asciidoctor.org/docs/asciidoc-writers-guide/][Asciidoctor]] (I was already using this)
+- [[http://docutils.sourceforge.net/rst.html][reStructuredText]]
+- [[https://orgmode.org/][Org]]
+
+This gave me the following chart:
+
+#+ATTR_HTML: :class table table-bordered
+| Feature  | Cross references | PlantUML etc. generation | TOC | LaTeX | HTML & CSS | Emacs mode?   |
+|----------+------------------+--------------------------+-----+-------+------------+---------------|
+| GFM      | not natively     | not natively             | no  | yes   | yes        | [[https://jblevins.org/projects/markdown-mode/][markdown-mode]] |
+| AsciiDoc | yes              | yes                      | yes | yes   | yes        | not really    |
+| rST      | yes              | yes                      | yes | yes   | yes        | [[http://docutils.sourceforge.net/docs/user/emacs.html][rst-mode]]      |
+| Org      | yes              | yes                      | yes | yes   | yes        | built-in      |
+
+As can be seen, only rST and Org satisfy all requirements, but in blog support
+in Sphinx is an afterthought and I dislike its syntax compared to Org.
+
+** Why org is my favourite format
+
+The reason for my switch was actually really simple. I very, very much hated
+editing [[https://asciidoctor.org/][AsciiDoc]]. That is not to say AsciiDoc is a bad format, on the contrary,
+of all the numerous [[https://en.wikipedia.org/wiki/Comparison_of_document_markup_languages][markup languages]] out there, it is by far the best, or well,
+/second best/. Org markup is more or less similar, with some superficial
+differences, but there is one absolutely major difference:
+
+Editing Org documents is pure, computerized bliss. It never gets in your way,
+and the advanced [[https://orgmode.org/manual/Global-and-local-cycling.html#Global-and-local-cycling][visibility cycling]] options make it easy to hide some of the
+markup. I have found that almost all markup languages tend to get in your
+way. The most glaring offender is links: in Markdown, the format is =[link
+title](http://url)=, in AsciiDoc it's =http://url[link title]=. Otherwise both
+markup languages are easy to read and do not intrude too much on the reader. 
+
+#+BEGIN_float-sm-right
+#+BEGIN_ml-sm-5
+#+ATTR_HTML: :width 350
+#+CAPTION: Clickable links. Yay!
+#+NAME: fig:wysiwyg
+[[file:../assets/images/wysiwyg.png]]
+#+END_ml-sm-5
+#+END_float-sm-right
+
+It would be insane to claim that markup languages should have /no markup/ — that
+would be impossible — but where Org does better is having a sort of WYSIWYG
+capability for displaying links. The links are natively clickable inside Emacs,
+which makes it easy to not only navigate through your notes or personal wikis,
+but makes linking across blog posts easy. The only way to link to a blog post,
+besides using raw URLs, was to do something like =link:{% post_url
+2019-03-02-foo-bar %}[Post title]=. In Org I @@html:<kbd>C-c C-l</kbd>@@ and I
+have automatic file completion for the org files in my directory, and the links
+are clickable and intrude no markup on the text, as can be seen in the above
+screenshot.
+
+Futhermore, there were no good AsciiDoc editing modes out there. I found several
+([[https://github.com/sensorflo/adoc-mode][one]] [[https://github.com/jmquigley/asciidoc-mode][two]] [[https://github.com/emanchado/asciidoc-mode][three]]) for Emacs, but they were all subpar, so I [[https://github.com/ane/emacs.d/blob/master/asciidoc.el][wrote my own.]] I tried
+plugins for [[https://code.visualstudio.com/][VS Code]] but it came nowhere near the functionality of Org.
+
+What truly sets Org apart is that it makes so many things that are commonplace
+with other markup languages completely unnecessary. Things like /live reloading/ 
+pages when you save them in the editor and the browser watches and reloads the
+page for you is unnecessary in org. In other markup formats it's one of the
+/must-have nice-to-haves/, since you're often left wondering how your markup
+trick looks like in the HTML output. Conversely, in org, the editing view of Org is an extremely
+accurate representation of the HTML output, so there is no need for this. Org
+can display inline images and renders tables so beautifully (did I mention it
+has spreadsheets?), so livereloading is simply a thing I don't need anymore.
+
+That said, I do keep a =python3 -m http.server= in the background, but where
+before I had a split-screen view of the editor and the browser, now the browser
+is just out there somewhere, and I only intermittently watch its output.
+
+*** Babel
+
+I'm a massive fan of [[https://orgmode.org/worg/org-contrib/babel/intro.html][org-babel]], which is a literate programming environment
+extension for Org. In short, it lets me do two important things:
+
+- **Editing***: edit source code blocks in their /native modes/ using
+  @@html:<kbd>C-c '</kbd>@@. 
+- **Tangling**: /run/ the source code blocks to produce output, such as PlantUML, graphviz,
+  Python, R and /embed the results/ into the document
+
+Editing in the native mode gives me correct indentation, syntax highlighting and
+plugins. Emacs' [[https://github.com/defunkt/markdown-mode][markdown-mode]] has a setting
+=markdown-fontify-code-blocks-natively= but this only gives syntax highlighting,
+not actual editing support. Having the major mode for the language gives me
+syntax highlighting, plugins, indentation, and so forth -- I'm no longer
+writing Markdown or AsciiDoc interspersed with code fragments, I'm writing code
+fragments with interspersed body text!
+
+So, for example, the following source code:
+
+#+begin_example
+#+begin_src dot :file ../assets/images/foo.svg :exports both
+  digraph {
+    a -> b;
+    b -> c;
+    c -> a;
+    d -> b;
+  }
+#+end_src
+
+#+RESULTS:
+[[file:../assets/images/foo.svg]]
+
+#+end_example
+after hitting @@html:<kbd>C-c C-c</kbd>@@ inside the source block, it produces this image:
+
+[[file:../assets/images/foo.svg]]
+
+#+BEGIN_float-sm-right
+#+BEGIN_ml-sm-3
+#+ATTR_HTML: :width 300
+[[file:../assets/images/babel.png][file:./../assets/images/babel.png]]
+#+END_ml-sm-3
+#+END_float-sm-right
+
+Of all literate programming environments out there, this is by /far/ the sanest
+way to integrate multi-language environments. I'm very fond of drawing all sorts
+of diagrams to assist my exposition, so the ability to use Babel to draw images
+is wonderful. I can use it to [[https://orgmode.org/worg/org-tutorials/org-R/org-R.html][generate R plots]] or run [[https://orgmode.org/worg/org-contrib/babel/languages.html][many more languages]]. I can
+even keep sessions to create real [[https://orgmode.org/manual/session.html][literate programming]] examples.
+
+*** CSS tricks
+
+Invoking CSS is easy enough. I use [[http://getbootstrap.com][Bootstrap]] to style and theme this site, and
+it provides handy [[https://getbootstrap.com/docs/4.1/utilities/float/][float]] and [[https://getbootstrap.com/docs/4.1/utilities/sizing/][sizing]] classes. Invoking this is easy enough in
+various languages:
+
+**Org**
+#+BEGIN_EXAMPLE 
+#+BEGIN_float-sm-right
+Lorem ipsum dolor sit amet.
+#+END_float-sm-right
+#+END_EXAMPLE
+
+**AsciiDoc**
+#+BEGIN_SRC asciidoc 
+[.float-sm-right]
+Lorem ipsum dolor sit amet.
+#+END_SRC
+
+**GFM (Kramdown)**
+#+BEGIN_SRC markdown 
+Lorem ipsum dolor sit amet.
+{:.float-sm-right}
+#+END_SRC
+
+As can be seen, all three formats allow for using custom CSS to style
+paragraphs. I like to use floating images to increase readability and fluidness
+of text.
+
+** Why not edit in Org and then convert it?
+
+Using Org itself to publish the blog seemed like a crazy idea at first. I could
+have simply enjoyed the editing experience by first editing the files in Org,
+and then using either [[https://github.com/emacsmirror/ox-asciidoc][export it to AsciiDoc using ox-asciidoc]] or use Pandoc to
+handle the conversion.
+
+The nice part about Babel is that it when publishing the HTML files using
+org-publish, it runs the Babel code blocks and exports the images as
+well. So it produces the =.html= file and then all =png=, =svg= etc. files are
+also copied to the right directories automatically. Pandoc isn't able to do
+this: first, I have to tangle (i.e. run) all source blocks to produce the
+images, then I have to convert the file to AsciiDoc using =pandoc -s -t post.org
+-o post.asciidoc=, and /then/ I have to copy all the images to the right place
+and check the images work. Org handles this in one go.
+
+*** Pandoc: convert anything to anything
+
+Indeed, Pandoc is brilliant, I saw no flaw in its org to asciidoc conversion
+capabilities. It even handles $\LaTeX$ brilliantly! Similarly, the org extension
+above was more than enough.
+
+At this point I must confess that while I could make a sound argument for using
+Org to /edit/ documents, it becomes clear that I don't have to use it to
+/publish/ documents. I could have either kept my Jekyll workflow as-is, and just
+used Pandoc to churn the Org into AsciiDoc. Indeed, it would have been a
+win-win, I would have gained the superior editing of Org and while retaining the minimalism and
+flexibility of Jekyll.
+
+In the end, Pandoc wasn't able to handle the CSS classes when converting from
+Org to AsciiDoc so I ended up rejecting the org to Pandoc to Jekyll workflow.
+Then, I tried the different exporting backends for org.
+
+*** Exporting org to another system
+
+Org has fantastic support for [[https://orgmode.org/manual/Exporting.html][exporting]], which supports babel. This is an
+/almost/ perfect solution. Many of the backends are really good. Turns out I had
+a lot of options:
+
+- [[https://orgmode.org/manual/Markdown-export.html][=org-md-export-to-markdown=]] :: Export the file as Markdown. So the flow would
+     have been org \to markdown \to jekyll.
+- [[https://github.com/larstvei/ox-gfm][=ox-gfm=]] :: Export the file as Github Flavoured Markdown, the same flow as above.
+- [[https://ox-hugo.scripter.co/][=ox-hugo=]] :: Export to [[https://gohugo.io/][Hugo]]. I would have to start using Hugo to build the
+     site, altering the flow to org \to hugo markdown \to hugo.
+- [[https://github.com/gonsie/ox-jekyll-md][=ox-jekyll=]] :: Export as Jekyll, retaining the same flow as the first one but
+     with [[https://jekyllrb.com/docs/front-matter/][the front matter]] done for me.
+- [[https://github.com/emacsmirror/ox-asciidoc][ox-asciidoc]] :: Export as AsciiDoc, so altering the existing org \to asciidoc \to
+     jekyll flow.
+     
+Before doing the conversion to Org, my workflow was to write in AsciiDoc and
+then use Jekyll. So by using Org as the editing system but not the ultimate
+publication system would have been fine, since Jekyll was already there, except
+for one tiny problem: custom CSS classes was totally unsupported by almost all
+backends. =ox-gfm= was the only backend that actually ported back the classes I
+had, but it omitted styling from certain elements (tables), so eventually I
+rejected it as well. It's still the best out of all five, and I came /very/
+close to not switch to org publishing.
+
+Hugo has native support for Org but not for Babel, so it obviously cannot run
+the source blocks. The same is with Jekyll and its various org
+converters. Additionally, those systems didn't support the conversion of CSS
+classes so they were out of the game quickly.
+
+*** Shave a different yak: asciidoc-mode
+
+One alternative would have been to improve my own AsciiDoc package for
+Emacs. Now it's just a collection of shitty regexps that can highlight bold,
+italics, links and listings, but not much else.
+
+Improving the package was indeed an alternative but all in all it I found org to
+be simply amazing to work with, and having felt the greatness of org, I was
+keenly aware of how getting AsciiDoc editing to the same level would have been a
+/herculean/ effort.
+
+So in the end, Org won. I was extremely biased in its favor and could justify
+its use -- to myself -- objectively enough to warrant its use. 
+
+** Conclusion: Org has it all
+
+Babel. Inline CSS. Semi-WYSIWYG editing. Extensive $\LaTeX$ support. Org has it
+all, and even if many came close, none came /close enough/ for me. Which is why
+I proceeded to build my blog generation using Org and the power of Emacs Lisp.
+
+* The setup
+
+Setting up Org for static site generation was easy enough. I followed the great
+examples of [[http://vicarie.in][Narendra Joshi]] and [[https://www.brautaset.org/][Stig Brautaset]], which helpfully provided their
+org publishing configuration in their blog posts. What I needed were four
+elements:
+
+- An index page to show new posts with their summaries
+- An 'about' page
+- A post archive grouped by year
+- RSS
+
+All of these were fairly easy to implement.
+
+** Foundations
+
+So, to start with, I set up [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html][.dir-locals.el]] to have directory local variables
+specific to the blog project only:
+
+#+CAPTION: =.dir-locals.el=
+#+INCLUDE: "../../.dir-locals.el" src emacs-lisp
+
+This sets up two things whenever opening a file in the directory:
+
+- it loads the contents of =config.org=, which contains the org configuration for
+  the project
+- it sets up a keybinding for @@html:<kbd>F3</kbd>@@ to publish a project called
+  blog defined in =config.org=
+  
+Then all we have to define is the content of =config.org=.
+
+** Literate configuration
+
+The contents of =config.org= is actually a literate Emacs Lisp file with Org
+commentary. Babel interprets the Lisp code inside as if it were a plain Lisp
+file. It's used to configure this blog! How cool is that? I include the
+contents of that file into the next section as-is, the result of this is the
+configuration I display in this org document is always up-to-date, because /it
+is/ the configuration for this blog by which this very text is published!
+  
+The load script has to find the directory of =config.org= by using the location of
+=.dir-locals.el=, since directly using =(load-file "config.org")= doesn't work, as the
+variables set in .dir-locals.el are specific to the /buffer being opened/, so
+the current directory is the directory of the file being visited, not the root
+folder. Additionally, [[https://github.com/bbatsov/projectile][projectile]] loads the directory locals file when visiting
+the project, so we need to see if we have a buffer open, otherwise we use the
+=default-directory= variable which projectile automatically sets for us to the
+project root directory.
+
+This lets me keep all the blog code in =config.org= in the blog project, instead of
+adding it into my =~/.emacs.d= folder. 
+
+** The directory structure
+
+I split the output into =out= and the code lives inside =src=. This is the
+directory structure, provided by calling =tree= from Babel:
+
+#+begin_src shell :results output :exports results
+tree -a -I "out|.git" -L 3 ../../ | tail -n +2 
+#+end_src
+
+#+RESULTS:
+#+begin_example
+|-- .dir-locals.el
+|-- config.el
+|-- config.org
+`-- src
+    |-- about.org
+    |-- archive.org
+    |-- assets
+    |   |-- hylo.js
+    |   |-- hyphenator.js
+    |   |-- images
+    |   `-- style.css
+    |-- index.org
+    `-- posts
+        |-- configuration.org
+        |-- emacs-and-org.org
+        `-- pieru.org
+
+4 directories, 12 files
+#+end_example
+
+The =src= directory is the source of the blog, and the =out= directory contains
+the static HTML to be uploaded.
+
+#+INCLUDE: "../../config.org" :minlevel 2
+
+** Building the site using continuous integration
+
+Why not? I'm still using Github Pages to host the site, so I can just reuse my
+old [[https://travis-ci.org/][Travis CI]] deployment mechanism. What this requires is defining an Emacs Lisp file
+that installs Org and then runs org-publish to build the site. Then we copy the
+file using the [[https://docs.travis-ci.com/user/deployment/pages/][Github Pages provider]] from Travis CI.
+
+Here is the =.travis.yml= file:
+
+
+
+

@@ -1,0 +1,7 @@
+#+TITLE: Archive
+#+OPTIONS: html-preamble:nil
+
+@@html:<h4>@@ 2019 @@html:</h4>@@ 
+@@html:<div class="row">@@ @@html:<div class="col-sm-2"><span class="text-muted">@@ 20 March @@html:</span></div>@@ @@html:<div class="col-sm-10">@@ [[file:posts/emacs-and-org.org][Using Emacs and Org to publish a blog]] @@html:</div>@@ @@html:</div>@@
+@@html:<div class="row">@@ @@html:<div class="col-sm-2"><span class="text-muted">@@ 14 March @@html:</span></div>@@ @@html:<div class="col-sm-10">@@ [[file:posts/configuration.org][Configurability]] @@html:</div>@@ @@html:</div>@@
+@@html:<div class="row">@@ @@html:<div class="col-sm-2"><span class="text-muted">@@ 10 March @@html:</span></div>@@ @@html:<div class="col-sm-10">@@ [[file:posts/pieru.org][Shit head]] @@html:</div>@@ @@html:</div>@@

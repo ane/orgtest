@@ -1,0 +1,6 @@
+#+TITLE: Index
+#+OPTIONS: html-preamble:nil
+
+@@html:<article>@@ @@html:<h2 class="h4">@@ [[file:posts/emacs-and-org.org][Using Emacs and Org to publish a blog]] @@html:<small class="text-muted">@@ Mar 20, 2019 @@html:</small></h2><p class="post-excerpt">@@ I converted my blog from Jekyll to be published using Emacs and Org. To say it was an interesting endeavor is an understatement. @@html:</p>@@ @@html:</article>@@
+@@html:<article>@@ @@html:<h2 class="h4">@@ [[file:posts/configuration.org][Configurability]] @@html:<small class="text-muted">@@ Mar 14, 2019 @@html:</small></h2><p class="post-excerpt">@@ Customizing software products can be done by creating derivate products by altering what is known as the baseline product. This results in effectively new products, and managing them involves complicated logistics. What if we brought all the custom features  @@html:</p>@@ @@html:</article>@@
+@@html:<article>@@ @@html:<h2 class="h4">@@ [[file:posts/pieru.org][Shit head]] @@html:<small class="text-muted">@@ Mar 10, 2019 @@html:</small></h2><p class="post-excerpt">@@ Fort bort short hort. @@html:</p>@@ @@html:</article>@@
