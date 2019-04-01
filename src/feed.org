@@ -1,0 +1,121 @@
+#+TITLE: Feed
+
+* [[file:/Users/akalmbach/code/kakka/src/posts/emacs-and-org.org][Using Emacs and Org to publish a blog]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/emacs-and-org.html
+:PUBDATE:  2019-03-20
+:ID:       1186AE4E-0BE1-48AA-BEFC-86A1308B9BB3
+:END:
+I converted my blog from Jekyll to be published using Emacs and Org. To say it was an interesting endeavor is an understatement.
+* [[file:/Users/akalmbach/code/kakka/src/posts/configurability.org][Configurability]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/configurability.html
+:PUBDATE:  2019-03-14
+:ID:       FB1122ED-B3CC-499E-ABC5-665184290A99
+:END:
+Configurability brings inherent flexibility to software but it has its limitations.
+* [[file:/Users/akalmbach/code/kakka/src/posts/pieru.org][Shit head]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/pieru.html
+:PUBDATE:  2019-03-10
+:ID:       4ABFF87D-55C5-4553-A886-1047BA39230B
+:END:
+Fort bort short hort.
+* [[file:/Users/akalmbach/code/kakka/src/posts/runtime-configuration-problem.org][The runtime configuration problem]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/runtime-configuration-problem.html
+:PUBDATE:  2018-09-16
+:ID:       24B2FEBF-BFCF-4B16-AF93-6C66947F949C
+:END:
+Configuring continuously running applications is a tricky problem.
+* [[file:/Users/akalmbach/code/kakka/src/posts/the-joy-of-asciidoc.org][The Joy of AsciiDoc]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/the-joy-of-asciidoc.html
+:PUBDATE:  2018-03-22
+:ID:       FA038B4E-2F0D-4340-8922-63CACA1C9441
+:END:
+Converting this site from Markdown to AsciiDoc was not as easy as I thought.
+* [[file:/Users/akalmbach/code/kakka/src/posts/envisioning-a-new-tracing-system.org][Envisioning a new tracing system]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/envisioning-a-new-tracing-system.html
+:PUBDATE:  2018-03-21
+:ID:       593FE7D7-1579-430E-994F-ADE2772F015F
+:END:
+Distributed tracing is really hard.
+* [[file:/Users/akalmbach/code/kakka/src/posts/useless-interfaces.org][Useless interfaces]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/useless-interfaces.html
+:PUBDATE:  2017-03-23
+:ID:       9999AA75-823A-440B-AA99-F5DCE3C5068A
+:END:
+Sometimes explicit is better than implicit.
+* [[file:/Users/akalmbach/code/kakka/src/posts/implicit-power.org][Implicit power]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/implicit-power.html
+:PUBDATE:  2017-03-15
+:ID:       BBA11870-3383-454F-B222-EFC916DE560A
+:END:
+How I managed to use all three kinds of Scala implicits in one bit of code.
+* [[file:/Users/akalmbach/code/kakka/src/posts/camel-abstractions.org][Apache Camel and the price of abstractions]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/camel-abstractions.html
+:PUBDATE:  2017-03-08
+:ID:       4F989AB6-28C2-48FE-BA11-44EF7C3B9115
+:END:
+There is always an inherent price in moving to a higher level of abstraction.
+* [[file:/Users/akalmbach/code/kakka/src/posts/web-development-weird.org][Web development has become weird]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/web-development-weird.html
+:PUBDATE:  2016-10-25
+:ID:       8AB95215-67B4-4564-8454-5293520D6503
+:END:
+The title says it all.
+* [[file:/Users/akalmbach/code/kakka/src/posts/communicators-functional-actors.org][Communicators: actors with purely functional state]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/communicators-functional-actors.html
+:PUBDATE:  2016-10-14
+:ID:       1F75ADD1-95DC-4924-9FDC-08B9E7B0082C
+:END:
+Mutable state is dangerous if used carelessly.
+* [[file:/Users/akalmbach/code/kakka/src/posts/focus.org][Focus]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/focus.html
+:PUBDATE:  2016-03-25
+:ID:       8726DF44-5381-4507-87EA-5A71FEC38224
+:END:
+The focus or the essence of a programming language is often the lynchpin of its design.
+* [[file:/Users/akalmbach/code/kakka/src/posts/imprecision-and-abstraction.org][Imprecision and abstraction]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/imprecision-and-abstraction.html
+:PUBDATE:  2016-03-17
+:ID:       3C0C306D-F853-4714-9DBB-35581B2746C5
+:END:
+Simplifications can sometimes make things harder to understand.
+* [[file:/Users/akalmbach/code/kakka/src/posts/are-my-services-talking-to-each-other.org][Are my services talking to each other?]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/are-my-services-talking-to-each-other.html
+:PUBDATE:  2016-01-26
+:ID:       4C6EC573-B068-4460-9875-FC09BD7B1ECB
+:END:
+Distributed tracing is hard.
+* [[file:/Users/akalmbach/code/kakka/src/posts/the-expression-problem-as-a-litmus-test.org][The expression problem as a litmus test]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/the-expression-problem-as-a-litmus-test.html
+:PUBDATE:  2016-01-08
+:ID:       EACB13F8-16CE-4C48-9794-6466637FA09C
+:END:
+The expression problem can be seen as a way to measure the expressive power of a programing language.
+* [[file:/Users/akalmbach/code/kakka/src/posts/before-we-begin.org][Before we begin]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/before-we-begin.html
+:PUBDATE:  2016-01-01
+:ID:       367F8ECE-974D-4912-877B-CB5EFCDF1DE8
+:END:
+It's not easy to write if your expectations are too high.
+* [[file:/Users/akalmbach/code/kakka/src/posts/start-once-software.org][Start-once software]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/start-once-software.html
+:PUBDATE:  2015-12-07
+:ID:       C28AD98A-E8E1-428C-90D3-7876BD0E52F5
+:END:
+Our development tools are transitioning away from batch oriented processing.

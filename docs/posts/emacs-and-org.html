@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 20 March 2019 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Using Emacs and Org to publish a blog</title>
+<meta name="generator" content="Org mode">
+<script src="/assets/hyphenator.js" type="text/javascript"></script>
+       <script src="/assets/hylo.js" type="text/javascript"></script>
+       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+       <link rel="stylesheet" href="/assets/style.css" type="text/css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div class="container hyphenate">
+
+<h1 class="my-3 mt-sm-5 h3 text-center">Antoine Kalmbach</h1>
+       <ul class="nav justify-content-center mb-5">
+         <li class="nav-item">
+          <a class="nav-link" href="/">Index</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/about.html">About</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/archive.html">Archive</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/feed.xml">RSS</a>
+         </li>
+       </ul><div id="preamble" class="status">
+<h2 class="page-header"> <a href="/posts/emacs-and-org.html">Using Emacs and Org to publish a blog</a> </h2>
+        <p class="text-muted post-meta">20 March 2019</p>
+</div>
+<div id="content">
+<p>
+Wiring up your own static site creator could be seen as a rite of passage for
+the modern programmer. The ultimate <a href="http://catb.org/jargon/html/Y/yak-shaving.html">yak shave</a>, I ended up redoing the static
+site generation engine for this blog using <a href="https://orgmode.org/">Org mode.</a> Org is an <a href="https://www.gnu.org/software/emacs/">Emacs</a> package for
+many, many things. One of these is <a href="https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html">publishing HTML pages</a>, so it can be used to
+generate static HTML sites. This document details the process I went through
+doing the conversion, and explains the background and reasoning for them.
+</p>
+
+<nav id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org3f32635">Introduction</a></li>
+<li><a href="#markup">Markup formats, the web and you</a>
+<ul>
+<li><a href="#org912c02b">The quest for proper markup</a></li>
+<li><a href="#org48123e6">Why org is my favourite format</a>
+<ul>
+<li><a href="#org3b24031">Babel</a></li>
+<li><a href="#orgf81aee1">CSS tricks</a></li>
+</ul>
+</li>
+<li><a href="#org4f5ca39">Alternatives to using Org exporting</a>
+<ul>
+<li><a href="#org4168c3e">Pandoc: convert anything to anything</a></li>
+<li><a href="#org28f82ce">Exporting org to another system</a></li>
+<li><a href="#org73d466f">Shave a different yak: asciidoc-mode</a></li>
+</ul>
+</li>
+<li><a href="#orga6c6466">Conclusion: Org has it all</a></li>
+</ul>
+</li>
+<li><a href="#configuring">Org as a static site generator</a>
+<ul>
+<li><a href="#org06dde62">Foundations</a>
+<ul>
+<li><a href="#org54f1f72">Literate configuration</a></li>
+<li><a href="#dir">The directory structure</a></li>
+</ul>
+</li>
+<li><a href="#orgf636a1a">Configuring <code>org-publish-project-alist</code></a>
+<ul>
+<li><a href="#orgdcf3900">Navigation, titles and footers</a></li>
+<li><a href="#orgae2f6dc">The publishing function</a></li>
+<li><a href="#orga33f2a6">The post index</a></li>
+<li><a href="#org0f502a4">The post archive</a></li>
+<li><a href="#orgd3493b0">Generating an RSS feed</a></li>
+<li><a href="#org982cf81">The configuration</a></li>
+</ul>
+</li>
+<li><a href="#org6711664">Deployment</a></li>
+</ul>
+</li>
+<li><a href="#org39e8fd1">Migration from Jekyll</a>
+<ul>
+<li><a href="#orgae2e1d5">Redirecting old permalinks</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">Conclusion</a>
+<ul>
+<li><a href="#orgabdc2f6">Evaluating the user experience</a>
+<ul>
+<li><a href="#org0e21e05">Improvements</a></li>
+<li><a href="#org73a1daa">Things I got rid of</a></li>
+</ul>
+</li>
+<li><a href="#org45b6f12">Summary and benchmarks</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+
+<div id="outline-container-org3f32635" class="outline-2">
+<h2 id="org3f32635">Introduction</h2>
+<div class="outline-text-2" id="text-org3f32635">
+<p>
+I've been an Emacs user since 2009. I use it at work to keep notes, to-do lists
+and sketch all sorts of diagrams and presentations. I don't use it for
+programming in my day job, the folks at <a href="https://www.jetbrains.com/">JetBrains</a> still have the edge when it
+comes to Scala and Java development environments. That said, when it comes to
+<i>fun</i>, such as Lisp or Haskell programming, I use Emacs.
+</p>
+
+<p>
+Last year, I found that Org has extensive <a href="https://www.gnu.org/software/emacs/manual/html_node/org/HTML-export.html">HTML exporting support</a>. The same
+system is used in what Org calls <a href="https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html">publishing projects</a>. This can be harnessed into
+a powerful static site generator that benefits from Org's superb editing
+capabilities and Emacs' built-in extensive flexibility and configurability.
+</p>
+
+<p>
+This post is a three-part detail of my journey where I converted my blog to use
+Emacs and Org to publish this blog instead of <a href="https://jekyllrb.com/">Jekyll</a>. It consists of two parts,
+the section <a href="#markup">Markup formats, the web and you</a> is where I explain my motivations in making the switch to
+Org. Then the section <a href="#configuring">Org as a static site generator</a> explains how I did it, and finally
+<a href="#conclusion">Conclusion</a> is a discussion and analysis of the whole process.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2cc4e8b" class="outline-2">
+<h2 id="markup">Markup formats, the web and you</h2>
+<div class="outline-text-2" id="text-markup">
+<p>
+Some people prefer to edit and publish blog posts using some sort of WYSIWYG
+editor, such as Wordpress or Blogger. I find editing raw documents using markup
+much more interesting. I want to have as much control as possible when authoring
+documents for the web. Already in university, working on my <a href="https://jyx.jyu.fi/handle/123456789/44048?locale-attribute=en">master's thesis,</a> I
+probably spent as much time formatting the \(\LaTeX\) output as I spent on writing
+content or research. 
+</p>
+
+<p>
+While WYSIWYG undoubtedly is the most intuitive way to process documents for the
+human mind, it has its problems. WYSIWYG sometimes gets in your way and its
+usability tends to limit the customizability of the output. That said, I don't
+think anyone is able to render \(\TeX\) or <i>in their head</i>, so clearly there is
+some value in having an <i>unobtrusive</i> markup format. So what you need is a
+markup format that is both inconspicuous and powerful. HTML is powerful, but not
+inconspicuous. You can do anything you want, but your text is full of tags. The
+same applies for \(\TeX\). Conversely, Markdown and Textile are inconspicuous, but
+they are arguably not as powerful as HTML or \(\TeX\).
+</p>
+
+<p>
+So what sort of balance between power and readability does one need? It quickly
+turns out markup languages are a pandora's box of their own: there are dozens of
+formats, and there are dozens of static site generators supporting each
+multitudes of markup formats, creating an enormous amount of combinations of
+engine and markup language.
+</p>
+</div>
+
+<div id="outline-container-org912c02b" class="outline-3">
+<h3 id="org912c02b">The quest for proper markup</h3>
+<div class="outline-text-3" id="text-org912c02b">
+<p>
+There are dozens and dozens of markup languages out there, but only few satisfy
+my needs. Markdown is of course the bare minimum with its unobtrusive syntax,
+but as one starts requiring more advanced features, it can no longer keep up.
+</p>
+
+<p>
+So, without further ado, here are things I absolutely require from a markup
+language for writing blog posts or technical documents:
+</p>
+
+<dl class="org-dl">
+<dt>Cross referencing</dt><dd>I need to <i>easily</i> create inline anchors and
+cross-reference them using links that automatically generate a link, so
+that if I add an anchor to a heading, and update its title, the change is
+reflected at the link site.</dd>
+<dt>PlantUML, graphviz, etc. support</dt><dd>The ability to embed graphviz source code
+to generate graphs and images inline is a really nice thing to have.</dd>
+<dt>Table of contents</dt><dd>A no-brainer. Long posts like these require a table of
+contents to make reading the text easier.</dd>
+<dt>LaTeX support</dt><dd>Sometimes I need to print some math, so LaTeX via MathJax is
+a must have.</dd>
+<dt>Inline HTML and CSS</dt><dd>Markups have their limits. Sometimes you need to add
+raw HTML to get what you want, and this has to be as lightweight as
+possible.</dd>
+</dl>
+
+<p>
+So after reviewing multiple formats, I narrowed it down to four:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.github.com/gfm/">Github Flavored Markdown</a></li>
+<li><a href="https://asciidoctor.org/docs/asciidoc-writers-guide/">Asciidoctor</a> (I was already using this)</li>
+<li><a href="http://docutils.sourceforge.net/rst.html">reStructuredText</a></li>
+<li><a href="https://orgmode.org/">Org</a></li>
+</ul>
+
+<p>
+This gave me the following chart:
+</p>
+
+<table class="table table-bordered">
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Feature</th>
+<th scope="col" class="org-left">Cross references</th>
+<th scope="col" class="org-left">PlantUML etc. generation</th>
+<th scope="col" class="org-left">TOC</th>
+<th scope="col" class="org-left">LaTeX</th>
+<th scope="col" class="org-left">HTML &amp; CSS</th>
+<th scope="col" class="org-left">Emacs mode?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">GFM</td>
+<td class="org-left">not natively</td>
+<td class="org-left">not natively</td>
+<td class="org-left">no</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left"><a href="https://jblevins.org/projects/markdown-mode/">markdown-mode</a></td>
+</tr>
+
+<tr>
+<td class="org-left">AsciiDoc</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">not really</td>
+</tr>
+
+<tr>
+<td class="org-left">rST</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left"><a href="http://docutils.sourceforge.net/docs/user/emacs.html">rst-mode</a></td>
+</tr>
+
+<tr>
+<td class="org-left">Org</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">yes</td>
+<td class="org-left">built-in</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+As can be seen, only rST and Org satisfy all requirements, but in blog support
+in Sphinx is an afterthought and I dislike its syntax compared to Org.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org48123e6" class="outline-3">
+<h3 id="org48123e6">Why org is my favourite format</h3>
+<div class="outline-text-3" id="text-org48123e6">
+<p>
+The reason for my switch was actually really simple. I very, very much hated
+editing <a href="https://asciidoctor.org/">AsciiDoc</a>. That is not to say AsciiDoc is a bad format, on the contrary,
+of all the numerous <a href="https://en.wikipedia.org/wiki/Comparison_of_document_markup_languages">markup languages</a> out there, it is by far the best, or well,
+<i>second best</i>. Org markup is more or less similar, with some superficial
+differences, but there is one absolutely major difference:
+</p>
+
+<p>
+Editing Org documents is pure, computerized bliss. It never gets in your way,
+and the advanced <a href="https://orgmode.org/manual/Global-and-local-cycling.html#Global-and-local-cycling">visibility cycling</a> options make it easy to hide some of the
+markup. I have found that almost all markup languages tend to get in your
+way. The most glaring offender is links: in Markdown, the format is <code>[link
+title](http://url)</code>, in AsciiDoc it's <code>http://url[link title]</code>. Otherwise both
+markup languages are easy to read and do not intrude too much on the reader. 
+</p>
+
+<div class="float-sm-right">
+<div class="ml-sm-5">
+
+<figure id="orgbbc83a4">
+<img src="../assets/images/wysiwyg.png" alt="wysiwyg.png" width="350">
+
+<figcaption><span class="figure-number">Figure 1: </span>Clickable links. Yay!</figcaption>
+</figure>
+
+</div>
+
+</div>
+
+<p>
+It would be insane to claim that markup languages should have <i>no markup</i> — that
+would be impossible — but where Org does better is having a sort of WYSIWYG
+capability for displaying links. The links are natively clickable inside Emacs,
+which makes it easy to not only navigate through your notes or personal wikis,
+but makes linking across blog posts easy. The only way to link to a blog post,
+besides using raw URLs, was to do something like <code>link:{% post_url
+2019-03-02-foo-bar %}[Post title]</code>. In Org I <kbd>C-c C-l</kbd> and I
+have automatic file completion for the org files in my directory, and the links
+are clickable and intrude no markup on the text, as can be seen in the above
+screenshot.
+</p>
+
+<p>
+Futhermore, there were no good AsciiDoc editing modes out there. I found several
+(<a href="https://github.com/sensorflo/adoc-mode">one</a> <a href="https://github.com/jmquigley/asciidoc-mode">two</a> <a href="https://github.com/emanchado/asciidoc-mode">three</a>) for Emacs, but they were all subpar, so I <a href="https://github.com/ane/emacs.d/blob/master/asciidoc.el">wrote my own.</a> I tried
+plugins for <a href="https://code.visualstudio.com/">VS Code</a> but it came nowhere near the functionality of Org.
+</p>
+
+<p>
+What truly sets Org apart is that it makes so many things that are commonplace
+with other markup languages completely unnecessary. Things like <i>live reloading</i> 
+pages when you save them in the editor and the browser watches and reloads the
+page for you is unnecessary in org. In other markup formats it's one of the
+<i>must-have nice-to-haves</i>, since you're often left wondering how your markup
+trick looks like in the HTML output. Conversely, in org, the editing view of Org is an extremely
+accurate representation of the HTML output, so there is no need for this. Org
+can display inline images and renders tables so beautifully (did I mention it
+has spreadsheets?), so livereloading is simply a thing I don't need anymore.
+</p>
+
+<p>
+That said, I do keep a <code>python3 -m http.server</code> in the background, but where
+before I had a split-screen view of the editor and the browser, now the browser
+is just out there somewhere, and I only intermittently watch its output.
+</p>
+</div>
+
+<div id="outline-container-org3b24031" class="outline-4">
+<h4 id="org3b24031">Babel</h4>
+<div class="outline-text-4" id="text-org3b24031">
+<p>
+I'm a massive fan of <a href="https://orgmode.org/worg/org-contrib/babel/intro.html">org-babel</a>, which is a literate programming environment
+extension for Org. In short, it lets me do two important things:
+</p>
+
+<ul class="org-ul">
+<li><b><b>Editing*</b></b>: edit source code blocks in their <i>native modes</i> using
+<kbd>C-c '</kbd>.</li>
+<li><b><b>Tangling</b></b>: <i>run</i> the source code blocks to produce output, such as PlantUML, graphviz,
+Python, R and <i>embed the results</i> into the document</li>
+</ul>
+
+<p>
+Editing in the native mode gives me correct indentation, syntax highlighting and
+plugins. Emacs' <a href="https://github.com/defunkt/markdown-mode">markdown-mode</a> has a setting
+<code>markdown-fontify-code-blocks-natively</code> but this only gives syntax highlighting,
+not actual editing support. Having the major mode for the language gives me
+syntax highlighting, plugins, indentation, and so forth &#x2013; I'm no longer
+writing Markdown or AsciiDoc interspersed with code fragments, I'm writing code
+fragments with interspersed body text!
+</p>
+
+<p>
+So, for example, the following source code:
+</p>
+
+<div class="float-sm-right">
+<div class="ml-sm-3">
+
+<figure>
+<a href="../assets/images/babel.png" width="300"><img src="./../assets/images/babel.png" alt="babel.png" width="300"></a>
+
+</figure>
+
+</div>
+
+</div>
+<pre class="example">
+#+begin_src dot :file ../assets/images/foo.svg :exports both
+  digraph {
+    a -&gt; b;
+    b -&gt; c;
+    c -&gt; a;
+    d -&gt; b;
+  }
+#+end_src
+
+#+RESULTS:
+[[file:../assets/images/foo.svg]]
+
+</pre>
+<p>
+after hitting <kbd>C-c C-c</kbd> inside the source block, it produces this image:
+</p>
+
+
+<figure>
+<object type="image/svg+xml" data="../assets/images/foo.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+
+</figure>
+
+
+<p>
+Of all literate programming environments out there, this is by <i>far</i> the sanest
+way to integrate multi-language environments. I'm very fond of drawing all sorts
+of diagrams to assist my exposition, so the ability to use Babel to draw images
+is wonderful. I can use it to <a href="https://orgmode.org/worg/org-tutorials/org-R/org-R.html">generate R plots</a> or run <a href="https://orgmode.org/worg/org-contrib/babel/languages.html">many more languages</a>. I can
+even keep sessions to create real <a href="https://orgmode.org/manual/session.html">literate programming</a> examples.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf81aee1" class="outline-4">
+<h4 id="orgf81aee1">CSS tricks</h4>
+<div class="outline-text-4" id="text-orgf81aee1">
+<p>
+Invoking CSS is easy enough. I use <a href="http://getbootstrap.com">Bootstrap</a> to style and theme this site, and
+it provides handy <a href="https://getbootstrap.com/docs/4.1/utilities/float/">float</a> and <a href="https://getbootstrap.com/docs/4.1/utilities/sizing/">sizing</a> classes. Invoking this is easy enough in
+various languages:
+</p>
+
+<p>
+<b><b>Org</b></b>
+</p>
+<pre class="example">
+#+BEGIN_float-sm-right
+Lorem ipsum dolor sit amet.
+#+END_float-sm-right
+</pre>
+
+<p>
+<b><b>AsciiDoc</b></b>
+</p>
+<div class="org-src-container">
+<pre class="src src-asciidoc"><span class="org-asciidoc-role">[.float-sm-right]</span>
+Lorem ipsum dolor sit amet.
+</pre>
+</div>
+
+<p>
+<b><b>GFM (Kramdown)</b></b>
+</p>
+<div class="org-src-container">
+<pre class="src src-markdown">Lorem ipsum dolor sit amet.
+<span class="org-markdown-markup">{:.float-sm-right}</span>
+</pre>
+</div>
+
+<p>
+As can be seen, all three formats allow for using custom CSS to style
+paragraphs. I like to use floating images to increase readability and fluidness
+of text.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4f5ca39" class="outline-3">
+<h3 id="org4f5ca39">Alternatives to using Org exporting</h3>
+<div class="outline-text-3" id="text-org4f5ca39">
+<p>
+Using Org itself to publish the blog seemed like a crazy idea at first. I could
+have simply enjoyed the editing experience by first editing the files in Org,
+and then using either <a href="https://github.com/emacsmirror/ox-asciidoc">export it to AsciiDoc using ox-asciidoc</a> or use Pandoc to
+handle the conversion.
+</p>
+
+<p>
+The nice part about Babel is that it when publishing the HTML files using
+org-publish, it runs the Babel code blocks and exports the images as
+well. So it produces the <code>.html</code> file and then all <code>png</code>, <code>svg</code> etc. files are
+also copied to the right directories automatically. Pandoc isn't able to do
+this: first, I have to tangle (i.e. run) all source blocks to produce the
+images, then I have to convert the file to AsciiDoc using <code>pandoc -s -t post.org
+-o post.asciidoc</code>, and <i>then</i> I have to copy all the images to the right place
+and check the images work. Org handles this in one go.
+</p>
+</div>
+
+<div id="outline-container-org4168c3e" class="outline-4">
+<h4 id="org4168c3e">Pandoc: convert anything to anything</h4>
+<div class="outline-text-4" id="text-org4168c3e">
+<p>
+Indeed, Pandoc is brilliant, I saw no flaw in its org to asciidoc conversion
+capabilities. It even handles \(\LaTeX\) brilliantly! Similarly, the org extension
+above was more than enough.
+</p>
+
+<p>
+At this point I must confess that while I could make a sound argument for using
+Org to <i>edit</i> documents, it becomes clear that I don't have to use it to
+<i>publish</i> documents. I could have either kept my Jekyll workflow as-is, and just
+used Pandoc to churn the Org into AsciiDoc. Indeed, it would have been a
+win-win, I would have gained the superior editing of Org and while retaining the minimalism and
+flexibility of Jekyll.
+</p>
+
+<p>
+In the end, Pandoc wasn't able to handle the CSS classes when converting from
+Org to AsciiDoc so I ended up rejecting the org to Pandoc to Jekyll workflow.
+Then, I tried the different exporting backends for org.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org28f82ce" class="outline-4">
+<h4 id="org28f82ce">Exporting org to another system</h4>
+<div class="outline-text-4" id="text-org28f82ce">
+<p>
+Org has fantastic support for <a href="https://orgmode.org/manual/Exporting.html">exporting</a>, which supports babel. This is an
+<i>almost</i> perfect solution. Many of the backends are really good. Turns out I had
+a lot of options:
+</p>
+
+<dl class="org-dl">
+<dt><a href="https://orgmode.org/manual/Markdown-export.html"><code>org-md-export-to-markdown</code></a></dt><dd>Export the file as Markdown. So the flow would
+have been org &rarr; markdown &rarr; jekyll.</dd>
+<dt><a href="https://github.com/larstvei/ox-gfm"><code>ox-gfm</code></a></dt><dd>Export the file as Github Flavoured Markdown, the same flow as above.</dd>
+<dt><a href="https://ox-hugo.scripter.co/"><code>ox-hugo</code></a></dt><dd>Export to <a href="https://gohugo.io/">Hugo</a>. I would have to start using Hugo to build the
+site, altering the flow to org &rarr; hugo markdown &rarr; hugo.</dd>
+<dt><a href="https://github.com/gonsie/ox-jekyll-md"><code>ox-jekyll</code></a></dt><dd>Export as Jekyll, retaining the same flow as the first one but
+with <a href="https://jekyllrb.com/docs/front-matter/">the front matter</a> done for me.</dd>
+<dt><a href="https://github.com/emacsmirror/ox-asciidoc">ox-asciidoc</a></dt><dd>Export as AsciiDoc, so altering the existing org &rarr; asciidoc &rarr;
+jekyll flow.</dd>
+</dl>
+
+<p>
+Before doing the conversion to Org, my workflow was to write in AsciiDoc and
+then use Jekyll. So by using Org as the editing system but not the ultimate
+publication system would have been fine, since Jekyll was already there, except
+for one tiny problem: custom CSS classes was totally unsupported by almost all
+backends. <code>ox-gfm</code> was the only backend that actually ported back the classes I
+had, but it omitted styling from certain elements (tables), so eventually I
+rejected it as well. It's still the best out of all five, and I came <i>very</i>
+close to not switch to org publishing.
+</p>
+
+<p>
+Hugo has native support for Org but not for Babel, so it obviously cannot run
+the source blocks. The same is with Jekyll and its various org
+converters. Additionally, those systems didn't support the conversion of CSS
+classes so they were out of the game quickly.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org73d466f" class="outline-4">
+<h4 id="org73d466f">Shave a different yak: asciidoc-mode</h4>
+<div class="outline-text-4" id="text-org73d466f">
+<p>
+One alternative would have been to improve my own AsciiDoc package for
+Emacs. Now it's just a collection of shitty regexps that can highlight bold,
+italics, links and listings, but not much else.
+</p>
+
+<p>
+Improving the package was indeed an alternative but all in all it I found org to
+be simply amazing to work with, and having felt the greatness of org, I was
+keenly aware of how getting AsciiDoc editing to the same level would have been a
+<i>herculean</i> effort.
+</p>
+
+<p>
+So in the end, Org won. I was extremely biased in its favor and could justify
+its use &#x2013; to myself &#x2013; objectively enough to warrant its use. 
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga6c6466" class="outline-3">
+<h3 id="orga6c6466">Conclusion: Org has it all</h3>
+<div class="outline-text-3" id="text-orga6c6466">
+<p>
+Babel. Inline CSS. Semi-WYSIWYG editing. Extensive \(\LaTeX\) support. Org has it
+all, and even if many came close, none came <i>close enough</i> for me. Which is why
+I proceeded to build my blog generation using Org and the power of Emacs Lisp.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc402825" class="outline-2">
+<h2 id="configuring">Org as a static site generator</h2>
+<div class="outline-text-2" id="text-configuring">
+<p>
+With Org's built-in publishing functionality, setting up a blog was stupidly
+easy at first. Getting any Org file out as HTML was easy, but to recreate my
+custom pages, the <a href="file:///home/ena/code/kakka/src/index.html">Index</a> and <a href="file:///home/ena/code/kakka/src/archive.html">Archive</a>, I had to resort to some Emacs Lisp hacking.
+</p>
+
+<p>
+Thankfully, I could stand on the shoulders of giants. I followed the great
+examples of <a href="http://vicarie.in">Narendra Joshi</a> and <a href="https://www.brautaset.org/">Stig Brautaset</a>, which helpfully provided their
+org publishing configuration in their blog posts. What I needed were four
+elements:
+</p>
+
+<ul class="org-ul">
+<li>An index page to show new posts with their summaries</li>
+<li>An 'about' page</li>
+<li>A post archive grouped by year</li>
+<li>RSS</li>
+</ul>
+
+<p>
+All of these were fairly easy to implement.
+</p>
+</div>
+
+<div id="outline-container-org06dde62" class="outline-3">
+<h3 id="org06dde62">Foundations</h3>
+<div class="outline-text-3" id="text-org06dde62">
+<p>
+So, to start with, I set up <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html">.dir-locals.el</a> to have directory local variables
+specific to the blog project only:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span><code>.dir-locals.el</code></label><pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-rainbow-delimiters-depth-2">(</span>nil . <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>eval . <span class="org-rainbow-delimiters-depth-5">(</span><span class="org-keyword">setq-local</span>
+                  blog-root
+                  <span class="org-rainbow-delimiters-depth-6">(</span><span class="org-keyword">if</span> buffer-file-name
+                      <span class="org-rainbow-delimiters-depth-7">(</span>file-name-directory
+                       <span class="org-rainbow-delimiters-depth-8">(</span>car <span class="org-rainbow-delimiters-depth-9">(</span>dir-locals-find-file <span class="org-rainbow-delimiters-depth-1">(</span>buffer-file-name<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span><span class="org-rainbow-delimiters-depth-8">)</span><span class="org-rainbow-delimiters-depth-7">)</span>
+                    default-directory<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-rainbow-delimiters-depth-4">(</span>eval . <span class="org-rainbow-delimiters-depth-5">(</span>local-set-key
+                  <span class="org-rainbow-delimiters-depth-6">(</span>kbd <span class="org-string">"&lt;f3&gt;"</span><span class="org-rainbow-delimiters-depth-6">)</span>
+                  <span class="org-rainbow-delimiters-depth-6">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-7">(</span>arg<span class="org-rainbow-delimiters-depth-7">)</span>
+                    <span class="org-rainbow-delimiters-depth-7">(</span><span class="org-keyword">interactive</span> <span class="org-string">"P"</span><span class="org-rainbow-delimiters-depth-7">)</span>
+                    <span class="org-rainbow-delimiters-depth-7">(</span><span class="org-keyword">when</span> arg
+                      <span class="org-rainbow-delimiters-depth-8">(</span>org-publish-remove-all-timestamps<span class="org-rainbow-delimiters-depth-8">)</span><span class="org-rainbow-delimiters-depth-7">)</span>
+                    <span class="org-rainbow-delimiters-depth-7">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-8">(</span><span class="org-rainbow-delimiters-depth-9">(</span>start-time <span class="org-rainbow-delimiters-depth-1">(</span>current-time<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span><span class="org-rainbow-delimiters-depth-8">)</span>
+                      <span class="org-rainbow-delimiters-depth-8">(</span><span class="org-keyword">save-excursion</span>
+                        <span class="org-rainbow-delimiters-depth-9">(</span>org-babel-load-file <span class="org-rainbow-delimiters-depth-1">(</span>expand-file-name <span class="org-string">"config.org"</span> blog-root<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span>
+                        <span class="org-rainbow-delimiters-depth-9">(</span>org-publish-project <span class="org-string">"blog"</span><span class="org-rainbow-delimiters-depth-9">)</span><span class="org-rainbow-delimiters-depth-8">)</span>
+                      <span class="org-rainbow-delimiters-depth-8">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-9">(</span><span class="org-rainbow-delimiters-depth-1">(</span>end-time <span class="org-rainbow-delimiters-depth-2">(</span>time-subtract <span class="org-rainbow-delimiters-depth-3">(</span>current-time<span class="org-rainbow-delimiters-depth-3">)</span> start-time<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span>
+                        <span class="org-rainbow-delimiters-depth-9">(</span>message <span class="org-string">"Blog published in %.2f seconds."</span> <span class="org-rainbow-delimiters-depth-1">(</span>float-time end-time<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span><span class="org-rainbow-delimiters-depth-8">)</span><span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+This sets up two things whenever opening a file in the directory:
+</p>
+
+<ul class="org-ul">
+<li>it sets up a keybinding for <kbd>F3</kbd> to publish a project called
+blog defined in <code>config.org</code></li>
+<li>it sets a buffer-local variable <code>blog-root</code> used throughout the configuration</li>
+</ul>
+
+<p>
+Then all we have to define is the content of <code>config.org</code>.
+</p>
+</div>
+
+<div id="outline-container-org54f1f72" class="outline-4">
+<h4 id="org54f1f72">Literate configuration</h4>
+<div class="outline-text-4" id="text-org54f1f72">
+<p>
+The contents of <code>config.org</code> is actually a literate Emacs Lisp file with Org
+commentary. Babel interprets the Lisp code inside as if it were a plain Lisp
+file. It's used to configure this blog! How cool is that? I include the
+contents of that file into the next section as-is, the result of this is the
+configuration I display in this org document is always up-to-date, because <i>it
+is</i> the configuration for this blog by which this very text is published!
+</p>
+
+<p>
+The load script has to find the directory of <code>config.org</code> by using the location of
+<code>.dir-locals.el</code>, since directly using <code>(load-file "config.org")</code> doesn't work, as the
+variables set in .dir-locals.el are specific to the <i>buffer being opened</i>, so
+the current directory is the directory of the file being visited, not the root
+folder. Additionally, <a href="https://github.com/bbatsov/projectile">projectile</a> loads the directory locals file when visiting
+the project, so we need to see if we have a buffer open, otherwise we use the
+<code>default-directory</code> variable which projectile automatically sets for us to the
+project root directory.
+</p>
+
+<p>
+This lets me keep all the blog code in <code>config.org</code> in the blog project, instead of
+adding it into my <code>~/.emacs.d</code> folder. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb4624ad" class="outline-4">
+<h4 id="dir">The directory structure</h4>
+<div class="outline-text-4" id="text-dir">
+<p>
+I split the output into <code>out</code> and the code lives inside <code>src</code>. This is the
+directory structure, provided by calling <code>tree</code> from Babel:
+</p>
+
+<pre class="example">
+├── bootstrap.el
+├── bootstrap.org
+├── config.el
+├── config.org
+├── .dir-locals.el
+├── .gitignore
+├── src
+│   ├── about.org
+│   ├── archive.org
+│   ├── assets
+│   │   ├── hylo.js
+│   │   ├── hyphenator.js
+│   │   ├── images
+│   │   └── style.css
+│   ├── feed.org
+│   ├── index.org
+│   └── posts
+│       ├── bootstrap.el
+│       ├── configuration.org
+│       ├── docs
+│       ├── emacs-and-org.org
+│       ├── pieru.org
+│       └── publish.sh
+└── .travis.yml
+
+5 directories, 19 files
+</pre>
+
+<p>
+The <code>src</code> directory is the source of the blog, and the <code>out</code> directory contains
+the static HTML to be uploaded.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf636a1a" class="outline-3">
+<h3 id="orgf636a1a">Configuring <code>org-publish-project-alist</code></h3>
+<div class="outline-text-3" id="text-orgf636a1a">
+<p>
+Publication happens using <kbd>M-x</kbd> <kbd>org-publish</kbd> which
+uses the value of <a href="https://orgmode.org/manual/Project-alist.html"><code>org-publish-project-alist</code></a>. We pass the values to the
+property list and it configures the blog.
+</p>
+
+<p>
+These are the elements of the configuration:
+</p>
+
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgdcf3900">Navigation, titles and footers</a></li>
+<li><a href="#orgae2f6dc">The publishing function</a></li>
+<li><a href="#orga33f2a6">The post index</a></li>
+<li><a href="#org0f502a4">The post archive</a></li>
+<li><a href="#orgd3493b0">Generating an RSS feed</a></li>
+<li><a href="#org982cf81">The configuration</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgdcf3900" class="outline-4">
+<h4 id="orgdcf3900">Navigation, titles and footers</h4>
+<div class="outline-text-4" id="text-orgdcf3900">
+<p>
+The property <code>:html-head-extra</code> adds text to the <code>&lt;head&gt;</code> tag of the document.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">setq</span> blog-html-head-extra
+      <span class="org-string">"&lt;script src=\"/assets/hyphenator.js\" type=\"text/javascript\"&gt;&lt;/script&gt;</span>
+<span class="org-string">       &lt;script src=\"/assets/hylo.js\" type=\"text/javascript\"&gt;&lt;/script&gt;</span>
+<span class="org-string">       &lt;link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\"&gt;</span>
+<span class="org-string">       &lt;link rel=\"stylesheet\" href=\"/assets/style.css\" type=\"text/css\"&gt;"</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+This adds Bootstrap and HyphenatorJS along with my <a href="../assets/style.css">custom CSS</a>.
+</p>
+</div>
+
+<div id="outline-container-org4cbc120" class="outline-5">
+<h5 id="org4cbc120">Navigation</h5>
+<div class="outline-text-5" id="text-org4cbc120">
+<p>
+The navigation bar that is shared by all pages is in the <code>:html-home/up-format</code>
+property. This is a format string with two arguments: the root directory and the
+directory above the current directory.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">setq</span> blog-html-up
+      <span class="org-string">"&lt;h1 class=\"my-3 mt-sm-5 h3 text-center\"&gt;Antoine Kalmbach&lt;/h1&gt;</span>
+<span class="org-string">       &lt;ul class=\"nav justify-content-center mb-5\"&gt;</span>
+<span class="org-string">         &lt;li class=\"nav-item\"&gt;</span>
+<span class="org-string">          &lt;a class=\"nav-link\" href=\"%s\"&gt;Index&lt;/a&gt;</span>
+<span class="org-string">         &lt;/li&gt;</span>
+<span class="org-string">         &lt;li class=\"nav-item\"&gt;</span>
+<span class="org-string">          &lt;a class=\"nav-link\" href=\"/about.html\"&gt;About&lt;/a&gt;</span>
+<span class="org-string">         &lt;/li&gt;</span>
+<span class="org-string">         &lt;li class=\"nav-item\"&gt;</span>
+<span class="org-string">          &lt;a class=\"nav-link\" href=\"/archive.html\"&gt;Archive&lt;/a&gt;</span>
+<span class="org-string">         &lt;/li&gt;</span>
+<span class="org-string">         &lt;li class=\"nav-item\"&gt;</span>
+<span class="org-string">          &lt;a class=\"nav-link\" href=\"/feed.xml\"&gt;RSS&lt;/a&gt;</span>
+<span class="org-string">         &lt;/li&gt;</span>
+<span class="org-string">       &lt;/ul&gt;"</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd873b26" class="outline-5">
+<h5 id="orgd873b26">Titles</h5>
+<div class="outline-text-5" id="text-orgd873b26">
+<p>
+Page and post titles are rendered using the <i>preamble</i> defined in
+<code>:html-preamble</code>. This is a function that accepts a property list of the current
+project. I extract the title and date and render the page using standard
+Bootstrap styles.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-html-preamble-fmt</span> <span class="org-rainbow-delimiters-depth-2">(</span>plist<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">when</span> <span class="org-rainbow-delimiters-depth-3">(</span>plist-get plist <span class="org-builtin">:title</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">let*</span>
+        <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-rainbow-delimiters-depth-5">(</span>dir <span class="org-rainbow-delimiters-depth-6">(</span>plist-get plist <span class="org-builtin">:publishing-directory</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span>
+         <span class="org-rainbow-delimiters-depth-5">(</span>path <span class="org-rainbow-delimiters-depth-6">(</span>file-relative-name <span class="org-rainbow-delimiters-depth-7">(</span>plist-get plist <span class="org-builtin">:output-file</span><span class="org-rainbow-delimiters-depth-7">)</span> dir<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+
+      <span class="org-rainbow-delimiters-depth-4">(</span>format
+       <span class="org-string">"&lt;h2 class=\"page-header\"&gt; &lt;a href=\"/%s\"&gt;%s&lt;/a&gt; &lt;/h2&gt;</span>
+<span class="org-string">        &lt;p class=\"text-muted post-meta\"&gt;%s&lt;/p&gt;"</span>
+       path
+       <span class="org-rainbow-delimiters-depth-5">(</span>car <span class="org-rainbow-delimiters-depth-6">(</span>plist-get plist <span class="org-builtin">:title</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span>
+       <span class="org-rainbow-delimiters-depth-5">(</span>org-timestamp-format <span class="org-rainbow-delimiters-depth-6">(</span>car <span class="org-rainbow-delimiters-depth-7">(</span>plist-get plist <span class="org-builtin">:date</span><span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span> <span class="org-string">"%d %B %Y"</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org3bd83e0" class="outline-5">
+<h5 id="org3bd83e0">Footer</h5>
+<div class="outline-text-5" id="text-org3bd83e0">
+<p>
+The footer renders using the <i>postamble</i> defined in <code>:html-postamble</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">setq</span> blog-html-down
+      <span class="org-string">"&lt;hr&gt;&lt;address&gt;Last modified on %T. Content licensed under &lt;a href=\"https://creativecommons.org/licenses/by-nc-sa/4.0/\"&gt;CC BY-NC-SA 4.0&lt;/a&gt;."</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgae2f6dc" class="outline-4">
+<h4 id="orgae2f6dc">The publishing function</h4>
+<div class="outline-text-4" id="text-orgae2f6dc">
+<p>
+Here, at last, we have to resort to some glorious Lisp code to get the results I
+want: the body rendered inside a Bootstrap <code>.container</code> class. I found this from
+<a href="http://vicarie.in">Narendra Joshi</a>'s blog:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-publish-html</span> <span class="org-rainbow-delimiters-depth-2">(</span>plist filename pub-dir<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Same as `</span><span class="org-doc"><span class="org-constant">org-html-publish-to-html</span></span><span class="org-doc">' but modifies html before finishing."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>file-path <span class="org-rainbow-delimiters-depth-5">(</span>org-html-publish-to-html plist filename pub-dir<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">with-current-buffer</span> <span class="org-rainbow-delimiters-depth-4">(</span>find-file-noselect file-path t<span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>goto-char <span class="org-rainbow-delimiters-depth-5">(</span>point-min<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>search-forward <span class="org-string">"&lt;body&gt;"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>insert <span class="org-string">"\n&lt;div class=\"container hyphenate\"&gt;\n"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>goto-char <span class="org-rainbow-delimiters-depth-5">(</span>point-max<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>search-backward <span class="org-string">"&lt;/body&gt;"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>insert <span class="org-string">"\n&lt;/div&gt;"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>save-buffer<span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>kill-buffer<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    file-path<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+Before we run this, we touch the file <code>index.org</code>, which is generated by the
+sitemap function, see below. This triggers modification for that file so that
+org will always publish the file. This is also from Narendra's blog.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">org-blog-prepare</span> <span class="org-rainbow-delimiters-depth-2">(</span>project-plist<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"With help from `</span><span class="org-doc"><span class="org-constant">https://github.com/howardabrams/dot-files</span></span><span class="org-doc">'.</span>
+<span class="org-doc">  Touch `</span><span class="org-doc"><span class="org-constant">index.org</span></span><span class="org-doc">' to rebuilt it.</span>
+<span class="org-doc">  Argument `</span><span class="org-doc"><span class="org-constant">PROJECT-PLIST</span></span><span class="org-doc">' contains information about the current project."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">progn</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">let*</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-rainbow-delimiters-depth-5">(</span>base-directory <span class="org-rainbow-delimiters-depth-6">(</span>plist-get project-plist <span class="org-builtin">:base-directory</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span>
+           <span class="org-rainbow-delimiters-depth-5">(</span>buffer <span class="org-rainbow-delimiters-depth-6">(</span>find-file-noselect <span class="org-rainbow-delimiters-depth-7">(</span>expand-file-name <span class="org-string">"index.org"</span> base-directory<span class="org-rainbow-delimiters-depth-7">)</span> t<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">with-current-buffer</span> buffer
+        <span class="org-rainbow-delimiters-depth-5">(</span>set-buffer-modified-p t<span class="org-rainbow-delimiters-depth-5">)</span>
+        <span class="org-rainbow-delimiters-depth-5">(</span>save-buffer 0<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>kill-buffer buffer<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga33f2a6" class="outline-4">
+<h4 id="orga33f2a6">The post index</h4>
+<div class="outline-text-4" id="text-orga33f2a6">
+<p>
+The blog index is generated using the sitemap function configured using
+<code>:sitemap-function</code> and <code>:sitemap-format-entry</code>. The former receives all sitemap
+entries each formatted by the latter.
+</p>
+
+<p>
+The formating function formats an entry for the index list:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">org-blog-sitemap-format-entry</span> <span class="org-rainbow-delimiters-depth-2">(</span>entry _style project<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Return string for each ENTRY in PROJECT."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">when</span> <span class="org-rainbow-delimiters-depth-3">(</span>s-starts-with-p <span class="org-string">"posts/"</span> entry<span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-rainbow-delimiters-depth-5">(</span>subtitle <span class="org-rainbow-delimiters-depth-6">(</span>car <span class="org-rainbow-delimiters-depth-7">(</span>org-publish-find-property entry <span class="org-builtin">:subtitle</span> project 'html<span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span>
+          <span class="org-rainbow-delimiters-depth-5">(</span>tags <span class="org-rainbow-delimiters-depth-6">(</span>org-publish-find-property entry <span class="org-builtin">:filetags</span> project 'html<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>format <span class="org-string">"@@html:&lt;h2 class=\"h4\"&gt;@@ [[file:%s][%s]] @@html:&lt;small class=\"text-muted\"&gt;@@ %s @@html:&lt;/small&gt;&lt;/h2&gt;&lt;p class=\"post-excerpt\"&gt;@@ %s @@html:&lt;/p&gt;@@"</span>
+              entry
+              <span class="org-rainbow-delimiters-depth-5">(</span>org-publish-find-title entry project<span class="org-rainbow-delimiters-depth-5">)</span>
+              <span class="org-rainbow-delimiters-depth-5">(</span>format-time-string <span class="org-string">"%h %d, %Y"</span>
+                                  <span class="org-rainbow-delimiters-depth-6">(</span>org-publish-find-date entry project<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span>
+              subtitle
+              <span class="org-rainbow-delimiters-depth-5">(</span>mapconcat <span class="org-rainbow-delimiters-depth-6">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-7">(</span>tag<span class="org-rainbow-delimiters-depth-7">)</span>
+                           <span class="org-rainbow-delimiters-depth-7">(</span>format <span class="org-string">"@@html:&lt;span class=\"badge badge-light\"&gt;@@ %s @@html:&lt;/span&gt;@@"</span> tag<span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span>
+                         tags
+                         <span class="org-string">""</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+And then the main function concatenates these posts into the index page.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">org-blog-sitemap-function</span> <span class="org-rainbow-delimiters-depth-2">(</span>title list<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Return sitemap using TITLE and LIST returned by `</span><span class="org-doc"><span class="org-constant">org-blog-sitemap-format-entry</span></span><span class="org-doc">'."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>concat <span class="org-string">"#+TITLE: "</span> title <span class="org-string">"\n"</span>
+          <span class="org-string">"#+OPTIONS: html-preamble:nil"</span> <span class="org-string">"\n\n"</span>
+          <span class="org-rainbow-delimiters-depth-3">(</span>mapconcat <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-5">(</span>li<span class="org-rainbow-delimiters-depth-5">)</span>
+                       <span class="org-rainbow-delimiters-depth-5">(</span>format <span class="org-string">"@@html:&lt;article&gt;@@ %s @@html:&lt;/article&gt;@@"</span> <span class="org-rainbow-delimiters-depth-6">(</span>car li<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+                     <span class="org-rainbow-delimiters-depth-4">(</span>seq-filter #'car <span class="org-rainbow-delimiters-depth-5">(</span>cdr list<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+                     <span class="org-string">"\n"</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+What actually the sitemap is about is that it generates an <i>org</i> file that is
+then also published by <code>org-publish</code>. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-org0f502a4" class="outline-4">
+<h4 id="org0f502a4">The post archive</h4>
+<div class="outline-text-4" id="text-org0f502a4">
+<p>
+This turned out to be rather tricky! Since org does not have any sort of easy
+support for generating pages with custom content, we need a way to generate a
+post archive by year. Fortunately, you can have as many sitemaps as you want, so
+all we have to do is create a second sitemap, called <i>archive</i>. This function
+formats each entry and returns a hash table for each file containing the file
+name, date and title, and generates a file called <code>archive.org</code> and then
+the first project ("posts") grabs it and publishes it as the <a href="../archive.html">Archive</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-year-archive-publishing-function</span> <span class="org-rainbow-delimiters-depth-2">(</span>_ _ _<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Does nothing, since we want the archive sitemap only to</span>
+<span class="org-doc">  publish the sitemap, but not the posts"</span>
+  nil<span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-year-archive-sitemap-entry</span> <span class="org-rainbow-delimiters-depth-2">(</span>entry _style project<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">when</span> <span class="org-rainbow-delimiters-depth-3">(</span>s-starts-with-p <span class="org-string">"posts/"</span> entry<span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-rainbow-delimiters-depth-5">(</span>date <span class="org-rainbow-delimiters-depth-6">(</span>org-publish-find-date entry project<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span>
+          <span class="org-rainbow-delimiters-depth-5">(</span>title <span class="org-rainbow-delimiters-depth-6">(</span>org-publish-find-title entry project<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      `<span class="org-rainbow-delimiters-depth-4">(</span><span class="org-builtin">:date</span> ,date <span class="org-builtin">:entry</span> ,entry <span class="org-builtin">:title</span> ,title<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+Then, the <i>pièce de résistance</i>, the following function groups them by year
+and splits them into different categories by year:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-year-archive-sitemap-function</span> <span class="org-rainbow-delimiters-depth-2">(</span>title list<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">let*</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>posts <span class="org-rainbow-delimiters-depth-5">(</span>seq-remove #'null <span class="org-rainbow-delimiters-depth-6">(</span>-flatten-n 1 <span class="org-rainbow-delimiters-depth-7">(</span>cdr list<span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-rainbow-delimiters-depth-4">(</span>grouped <span class="org-rainbow-delimiters-depth-5">(</span>seq-group-by
+                   <span class="org-rainbow-delimiters-depth-6">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-7">(</span>entry<span class="org-rainbow-delimiters-depth-7">)</span>
+                     <span class="org-rainbow-delimiters-depth-7">(</span><span class="org-keyword">when-let*</span> <span class="org-rainbow-delimiters-depth-8">(</span><span class="org-rainbow-delimiters-depth-9">(</span>date <span class="org-rainbow-delimiters-depth-1">(</span>plist-get entry <span class="org-builtin">:date</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span>
+                                 <span class="org-rainbow-delimiters-depth-9">(</span>year <span class="org-rainbow-delimiters-depth-1">(</span>nth 5 <span class="org-rainbow-delimiters-depth-2">(</span>decode-time date<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span><span class="org-rainbow-delimiters-depth-8">)</span>
+                       year<span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span>
+                   posts<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span>mapconcat
+     <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-5">(</span>grp<span class="org-rainbow-delimiters-depth-5">)</span>
+       <span class="org-rainbow-delimiters-depth-5">(</span><span class="org-keyword">let*</span> <span class="org-rainbow-delimiters-depth-6">(</span><span class="org-rainbow-delimiters-depth-7">(</span>year <span class="org-rainbow-delimiters-depth-8">(</span>car grp<span class="org-rainbow-delimiters-depth-8">)</span><span class="org-rainbow-delimiters-depth-7">)</span>
+              <span class="org-rainbow-delimiters-depth-7">(</span>posts <span class="org-rainbow-delimiters-depth-8">(</span>cdr grp<span class="org-rainbow-delimiters-depth-8">)</span><span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span>
+         <span class="org-rainbow-delimiters-depth-6">(</span>concat
+          <span class="org-string">"#+TITLE: "</span> title <span class="org-string">"\n"</span>
+          <span class="org-string">"#+OPTIONS: html-preamble:nil"</span> <span class="org-string">"\n\n"</span>
+          <span class="org-rainbow-delimiters-depth-7">(</span>format
+           <span class="org-string">"@@html:&lt;h4&gt;@@ %s @@html:&lt;/h4&gt;@@ \n"</span> year<span class="org-rainbow-delimiters-depth-7">)</span>
+          <span class="org-rainbow-delimiters-depth-7">(</span>mapconcat
+           <span class="org-rainbow-delimiters-depth-8">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-9">(</span>post<span class="org-rainbow-delimiters-depth-9">)</span>
+             <span class="org-rainbow-delimiters-depth-9">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-1">(</span><span class="org-rainbow-delimiters-depth-2">(</span>title <span class="org-rainbow-delimiters-depth-3">(</span>plist-get post <span class="org-builtin">:title</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+                   <span class="org-rainbow-delimiters-depth-2">(</span>date <span class="org-rainbow-delimiters-depth-3">(</span>plist-get post <span class="org-builtin">:date</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+                   <span class="org-rainbow-delimiters-depth-2">(</span>file <span class="org-rainbow-delimiters-depth-3">(</span>plist-get post <span class="org-builtin">:entry</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+               <span class="org-rainbow-delimiters-depth-1">(</span>format
+                <span class="org-string">"@@html:&lt;div class=\"row\"&gt;@@ %s %s @@html:&lt;/div&gt;@@"</span>
+                <span class="org-rainbow-delimiters-depth-2">(</span>format
+                 <span class="org-string">"@@html:&lt;div class=\"col-sm-2\"&gt;&lt;span class=\"text-muted\"&gt;@@ %s @@html:&lt;/span&gt;&lt;/div&gt;@@"</span>
+                 <span class="org-rainbow-delimiters-depth-3">(</span>format-time-string <span class="org-string">"%d %B"</span> date<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+                <span class="org-rainbow-delimiters-depth-2">(</span>format
+                 <span class="org-string">"@@html:&lt;div class=\"col-sm-10\"&gt;@@ [[file:%s][%s]] @@html:&lt;/div&gt;@@"</span>
+                 file 
+                 title<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-9">)</span><span class="org-rainbow-delimiters-depth-8">)</span>
+           posts
+           <span class="org-string">"\n"</span><span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+     grouped
+     <span class="org-string">"\n"</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd3493b0" class="outline-4">
+<h4 id="orgd3493b0">Generating an RSS feed</h4>
+<div class="outline-text-4" id="text-orgd3493b0">
+<p>
+Getting RSS requires a third sitemap. How <code>ox-rss.el</code> works is that it parses a
+file containing top-level headlines and generates a RSS <code>&lt;item&gt;</code> feed out of
+them. I can't therefore use my <code>index.org</code> or <code>archive.org</code> to generate them as
+they contain too much HTML markup and the titles are weirdly formatted
+anyway. Fortunately, <a href="https://writepermission.com/org-blogging-rss-feed.html">Toon Claes</a> had already found a solution for this, which is
+just generating a third sitemap. This function publishes the main <code>feed.org</code>
+file, and gives it a title and then formats <code>list</code> as headings.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-rss-sitemap</span> <span class="org-rainbow-delimiters-depth-2">(</span>title list<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Create a RSS sitemap"</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>concat <span class="org-string">"#+TITLE: "</span> title <span class="org-string">"\n\n"</span>
+          <span class="org-rainbow-delimiters-depth-3">(</span>org-list-to-subtree list '<span class="org-rainbow-delimiters-depth-4">(</span><span class="org-builtin">:icount</span> <span class="org-string">""</span> <span class="org-builtin">:istart</span> <span class="org-string">""</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+Then we generate headings for all entries in the list. The two attributes
+<code>RSS_PERMALINK</code> and <code>PUBDATE</code> need to be set by us, because if omitted, <code>ox-rss</code>
+will try to invent suitable values for them. The publication date becomes the
+current date and time of the publication invocation and that's not correct.
+So by setting <a href="#coderef-pub" class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-pub');" onmouseout="CodeHighlightOff(this, 'coderef-pub');">PUBDATE</a> we add the date from the <code>#+DATE</code> header to mark the publication date.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-rss-sitemap-entry</span> <span class="org-rainbow-delimiters-depth-2">(</span>entry style project<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Format ENTRY for the RSS feed.</span>
+<span class="org-doc">ENTRY is a file name.  STYLE is either 'list' or 'tree'.</span>
+<span class="org-doc">PROJECT is the current project."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">cond</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>not <span class="org-rainbow-delimiters-depth-5">(</span>directory-name-p entry<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">let*</span> <span class="org-rainbow-delimiters-depth-5">(</span><span class="org-rainbow-delimiters-depth-6">(</span>file <span class="org-rainbow-delimiters-depth-7">(</span>org-publish--expand-file-name entry project<span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span>
+                <span class="org-rainbow-delimiters-depth-6">(</span>title <span class="org-rainbow-delimiters-depth-7">(</span>org-publish-find-title entry project<span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span>
+                <span class="org-rainbow-delimiters-depth-6">(</span>date <span class="org-rainbow-delimiters-depth-7">(</span>format-time-string <span class="org-string">"%Y-%m-%d"</span> <span class="org-rainbow-delimiters-depth-8">(</span>org-publish-find-date entry project<span class="org-rainbow-delimiters-depth-8">)</span><span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span>
+                <span class="org-rainbow-delimiters-depth-6">(</span>link <span class="org-rainbow-delimiters-depth-7">(</span>concat <span class="org-rainbow-delimiters-depth-8">(</span>file-name-sans-extension entry<span class="org-rainbow-delimiters-depth-8">)</span> <span class="org-string">".html"</span><span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span>
+           <span class="org-rainbow-delimiters-depth-5">(</span><span class="org-keyword">with-temp-buffer</span>
+             <span class="org-rainbow-delimiters-depth-6">(</span>insert <span class="org-rainbow-delimiters-depth-7">(</span>format <span class="org-string">"* [[file:%s][%s]]\n"</span> file title<span class="org-rainbow-delimiters-depth-7">)</span><span class="org-rainbow-delimiters-depth-6">)</span>
+             <span class="org-rainbow-delimiters-depth-6">(</span>org-set-property <span class="org-string">"RSS_PERMALINK"</span> link<span class="org-rainbow-delimiters-depth-6">)</span>
+<span id="coderef-pub" class="coderef-off">             <span class="org-rainbow-delimiters-depth-6">(</span>org-set-property <span class="org-string">"PUBDATE"</span> date<span class="org-rainbow-delimiters-depth-6">)</span></span>
+             <span class="org-rainbow-delimiters-depth-6">(</span>org-id-get-create<span class="org-rainbow-delimiters-depth-6">)</span>
+             <span class="org-rainbow-delimiters-depth-6">(</span>buffer-string<span class="org-rainbow-delimiters-depth-6">)</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+        <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>eq style 'tree<span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-comment-delimiter">;; </span><span class="org-comment">Return only last subdir.</span>
+         <span class="org-rainbow-delimiters-depth-4">(</span>file-name-nondirectory <span class="org-rainbow-delimiters-depth-5">(</span>directory-file-name entry<span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+        <span class="org-rainbow-delimiters-depth-3">(</span>t entry<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+Lastly, we skip all files except <code>feed.org</code>, since we don't to only publish
+<code>feed.org</code> as XML, not the posts.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">blog-rss-publishing-function</span> <span class="org-rainbow-delimiters-depth-2">(</span>plist filename pub-dir<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Publish RSS with PLIST, only when FILENAME is 'rss.org'.</span>
+<span class="org-doc">PUB-DIR is when the output will be placed."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>equal <span class="org-string">"feed.org"</span> <span class="org-rainbow-delimiters-depth-4">(</span>file-name-nondirectory filename<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+      <span class="org-rainbow-delimiters-depth-3">(</span>org-rss-publish-to-rss plist filename pub-dir<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org982cf81" class="outline-4">
+<h4 id="org982cf81">The configuration</h4>
+<div class="outline-text-4" id="text-org982cf81">
+<p>
+Now we've defined all we need for the project configuration. Without further
+ado:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">setq</span> org-publish-project-alist
+      `<span class="org-rainbow-delimiters-depth-2">(</span><span class="org-rainbow-delimiters-depth-3">(</span><span class="org-string">"posts"</span>
+         <span class="org-builtin">:base-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"src/"</span><span class="org-rainbow-delimiters-depth-4">)</span>        <span class="org-comment-delimiter">;; </span><span class="org-comment">the sources of the posts</span>
+         <span class="org-builtin">:exclude</span> <span class="org-string">".*drafts/.*</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">|</span></span><span class="org-string">feed.*"</span>                            <span class="org-comment-delimiter">;; </span><span class="org-comment">don't publish draft posts</span>
+         <span class="org-builtin">:base-extension</span> <span class="org-string">"org"</span>                             <span class="org-comment-delimiter">;; </span><span class="org-comment">only org files</span>
+
+         <span class="org-builtin">:publishing-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"out/"</span><span class="org-rainbow-delimiters-depth-4">)</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">results go here</span>
+         <span class="org-builtin">:publishing-function</span> blog-publish-html            <span class="org-comment-delimiter">;; </span><span class="org-comment">the function we use to publish</span>
+
+         <span class="org-builtin">:preparation-function</span> org-blog-prepare            <span class="org-comment-delimiter">;; </span><span class="org-comment">called before publishing</span>
+         <span class="org-builtin">:recursive</span> t                                      <span class="org-comment-delimiter">;; </span><span class="org-comment">publish all files recursively</span>
+
+         <span class="org-builtin">:html-link-home</span> <span class="org-string">"/"</span>                               <span class="org-comment-delimiter">;; </span><span class="org-comment">home points here</span>
+         <span class="org-builtin">:html-link-up</span> <span class="org-string">"/"</span>                                 <span class="org-comment-delimiter">;; </span><span class="org-comment">up as well</span>
+         <span class="org-builtin">:html-head-extra</span> ,blog-html-head-extra            <span class="org-comment-delimiter">;; </span><span class="org-comment">&lt;head&gt; conents</span>
+         <span class="org-builtin">:html-head-include-scripts</span> t                      <span class="org-comment-delimiter">;; </span><span class="org-comment">add org built-in js </span>
+         <span class="org-builtin">:html-head-include-default-style</span> nil              <span class="org-comment-delimiter">;; </span><span class="org-comment">no org default css</span>
+         <span class="org-builtin">:html-home/up-format</span> ,blog-html-up                <span class="org-comment-delimiter">;; </span><span class="org-comment">the navigation menu</span>
+         <span class="org-builtin">:html-preamble</span> blog-html-preamble-fmt             <span class="org-comment-delimiter">;; </span><span class="org-comment">title (preamble) formating</span>
+         <span class="org-builtin">:html-postamble</span> ,blog-html-down                   <span class="org-comment-delimiter">;; </span><span class="org-comment">footer</span>
+         <span class="org-builtin">:html-metadata-timestamp-format</span> <span class="org-string">"%e %B %Y"</span>        <span class="org-comment-delimiter">;; </span><span class="org-comment">timestamps in the footer</span>
+
+         <span class="org-builtin">:with-toc</span> nil                                     <span class="org-comment-delimiter">;; </span><span class="org-comment">no toc by default</span>
+         <span class="org-builtin">:with-title</span> nil                                   <span class="org-comment-delimiter">;; </span><span class="org-comment">no title either</span>
+         <span class="org-builtin">:with-date</span> t                                      <span class="org-comment-delimiter">;; </span><span class="org-comment">has no effect either</span>
+         <span class="org-builtin">:section-numbers</span> nil                              <span class="org-comment-delimiter">;; </span><span class="org-comment">no section numbers</span>
+         <span class="org-builtin">:html-doctype</span> <span class="org-string">"html5"</span>                             <span class="org-comment-delimiter">;; </span><span class="org-comment">fancy semantic html5 tags</span>
+         <span class="org-builtin">:html-html5-fancy</span> t                               <span class="org-comment-delimiter">;; </span><span class="org-comment">fancy the max</span>
+         <span class="org-builtin">:htmlized-source</span> t                                <span class="org-comment-delimiter">;; </span><span class="org-comment">use CSS for sources, instead of inline </span>
+
+         <span class="org-builtin">:auto-sitemap</span> t                                   <span class="org-comment-delimiter">;; </span><span class="org-comment">publish the index</span>
+         <span class="org-builtin">:sitemap-filename</span> <span class="org-string">"index.org"</span>                     <span class="org-comment-delimiter">;; </span><span class="org-comment">to this file</span>
+         <span class="org-builtin">:sitemap-title</span> <span class="org-string">"Index"</span>                            <span class="org-comment-delimiter">;; </span><span class="org-comment">with this title</span>
+         <span class="org-builtin">:sitemap-style</span> list                               <span class="org-comment-delimiter">;; </span><span class="org-comment">no effect</span>
+
+         <span class="org-comment-delimiter">;; </span><span class="org-comment">these functions determine the style of the index</span>
+         <span class="org-builtin">:sitemap-sort-files</span> anti-chronologically
+         <span class="org-builtin">:sitemap-format-entry</span> org-blog-sitemap-format-entry
+         <span class="org-builtin">:sitemap-function</span> org-blog-sitemap-function
+         <span class="org-comment-delimiter">;; </span><span class="org-comment">)))</span>
+         <span class="org-rainbow-delimiters-depth-3">)</span>
+        <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-string">"assets"</span>
+         <span class="org-builtin">:base-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"src/assets/"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-builtin">:base-extension</span> <span class="org-string">"png</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">|</span></span><span class="org-string">css</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">|</span></span><span class="org-string">svg</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">|</span></span><span class="org-string">js"</span>
+         <span class="org-builtin">:publishing-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"out/assets/"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-builtin">:publishing-function</span> org-publish-attachment
+         <span class="org-builtin">:recursive</span> t<span class="org-rainbow-delimiters-depth-3">)</span>
+        <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-string">"archive"</span>
+         <span class="org-builtin">:base-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"src/"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-builtin">:base-extension</span> <span class="org-string">"org"</span>
+         <span class="org-builtin">:recursive</span> t
+
+         <span class="org-builtin">:publishing-function</span> blog-year-archive-publishing-function
+         <span class="org-builtin">:publishing-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"out/"</span><span class="org-rainbow-delimiters-depth-4">)</span> <span class="org-comment-delimiter">;</span>
+         <span class="org-builtin">:auto-sitemap</span> t
+         <span class="org-builtin">:sitemap-filename</span> <span class="org-string">"archive.org"</span>
+         <span class="org-builtin">:sitemap-title</span> <span class="org-string">"Archive"</span>
+         <span class="org-builtin">:sitemap-style</span> list
+         <span class="org-builtin">:sitemap-function</span> blog-year-archive-sitemap-function
+         <span class="org-builtin">:sitemap-format-entry</span> blog-year-archive-sitemap-entry
+
+         <span class="org-builtin">:sitemap-sort-files</span> anti-chronologically
+         <span class="org-rainbow-delimiters-depth-3">)</span>
+        <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-string">"rss"</span>
+         <span class="org-builtin">:base-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"src/"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-builtin">:base-extension</span> <span class="org-string">"org"</span>
+         <span class="org-builtin">:exclude</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>regexp-opt '<span class="org-rainbow-delimiters-depth-5">(</span><span class="org-string">"archive.org"</span> <span class="org-string">"index.org"</span> <span class="org-string">"about.org"</span><span class="org-rainbow-delimiters-depth-5">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+         <span class="org-builtin">:recursive</span> t
+
+         <span class="org-builtin">:description</span> <span class="org-string">"The website of Antoine Kalmbach"</span>
+         <span class="org-builtin">:html-link-home</span> <span class="org-string">"http://ane.github.io/"</span>
+         <span class="org-builtin">:html-link-use-abs-url</span> t
+         <span class="org-builtin">:html-link-org-files-as-html</span> t
+         <span class="org-builtin">:rss-extension</span> <span class="org-string">"xml"</span>
+
+         <span class="org-builtin">:publishing-directory</span> ,<span class="org-rainbow-delimiters-depth-4">(</span>concat blog-root <span class="org-string">"out/"</span><span class="org-rainbow-delimiters-depth-4">)</span> <span class="org-comment-delimiter">;</span>
+         <span class="org-builtin">:publishing-function</span> blog-rss-publishing-function
+
+         <span class="org-builtin">:auto-sitemap</span> t
+         <span class="org-builtin">:sitemap-filename</span> <span class="org-string">"feed.org"</span>
+         <span class="org-builtin">:sitemap-title</span> <span class="org-string">"Feed"</span>
+         <span class="org-builtin">:sitemap-style</span> list
+         <span class="org-builtin">:sitemap-function</span> blog-rss-sitemap
+         <span class="org-builtin">:sitemap-format-entry</span> blog-rss-sitemap-entry
+         <span class="org-builtin">:sitemap-sort-files</span> anti-chronologically
+
+         <span class="org-builtin">:with-toc</span> nil
+         <span class="org-builtin">:section-numbers</span> nil<span class="org-rainbow-delimiters-depth-3">)</span>
+        <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-string">"blog"</span>
+         <span class="org-builtin">:components</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-string">"assets"</span> <span class="org-string">"archive"</span> <span class="org-string">"rss"</span> <span class="org-string">"posts"</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+</pre>
+</div>
+
+<p>
+This creates three components for the <code>blog</code> project:
+</p>
+
+<ul class="org-ul">
+<li><b><b>posts</b></b>, the blog posts used to generate the <a href="../index.html">index</a></li>
+<li><b><b>archive</b></b>, which is a secondary sitemap used to generate the <a href="../archive.html">archive</a></li>
+<li><b><b>assets</b></b>, a project that just copies the images and other static crap to the
+output directory</li>
+<li><b><b>rss</b></b> that publishes RSS</li>
+</ul>
+
+<p>
+So, now hitting either <kbd>F3</kbd> will publish the <code>blog</code> project,
+which publishes everything I need. Next, it's time for something completely different.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6711664" class="outline-3">
+<h3 id="org6711664">Deployment</h3>
+<div class="outline-text-3" id="text-org6711664">
+<p>
+I'm still using Github Pages, and it has for some years had the support for
+hosting your html content from the <code>docs</code> directory in the master branch. So
+now you don't need anything complicated to publish your content there. Before,
+I used a weird Travis CI setup that built the site and then overwrote the master
+branch with the published data. That felt weird. The content changes too rarely
+to justify CI, so I contend myself with just committing the directory and
+pushing it to Git. I mean, I could have started doing that with Jekyll as well,
+but the Travis CI thing I had worked just fine.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org39e8fd1" class="outline-2">
+<h2 id="org39e8fd1">Migration from Jekyll</h2>
+<div class="outline-text-2" id="text-org39e8fd1">
+<p>
+So now that the configuration itself is ready, I need to convert all existing
+posts into org using pandoc. 
+</p>
+</div>
+
+<div id="outline-container-orgae2e1d5" class="outline-3">
+<h3 id="orgae2e1d5">Redirecting old permalinks</h3>
+<div class="outline-text-3" id="text-orgae2e1d5">
+<p>
+My Jekyll posts all were using the standard Jekyll format of
+<code>/YYYY/MM/DD/post-title.html</code>. I have found some people linking to my posts,
+even a <a href="https://www.semanticscholar.org/paper/An-Analysis-and-Discussion-of-Solutions-to-the-Tian-Wei/dd109b780f300f5d7259a85a67447d4d0d5b1914?navId=references">research paper</a> (!?) pointing to one blog post. I want those links to be
+eternal, so I had to add a redirect page for all posts.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdd1a311" class="outline-2">
+<h2 id="conclusion">Conclusion</h2>
+<div class="outline-text-2" id="text-conclusion">
+<div class="font-italic">
+<p>
+TL;DR: Gets mad at Jekyll, writes 500 lines of Emacs Lisp, thinks he found a solution.
+</p>
+
+</div>
+
+<p>
+This section concludes with an analysis of what went into the conversion and how
+I felt about it. I try to be as objective as can, and I will most likely won't
+be, but I don't care!
+</p>
+</div>
+
+
+<div id="outline-container-orgabdc2f6" class="outline-3">
+<h3 id="orgabdc2f6">Evaluating the user experience</h3>
+<div class="outline-text-3" id="text-orgabdc2f6">
+<p>
+What about the complexity of the overall solution? Was Org really hassle-free?
+</p>
+
+<p>
+Currently, there are nil lines of Emacs Lisp in the configuration to generate this
+blog. The old Jekyll setup is about 600 hundred lines, including layouts, the
+blog index, the post archive and many more.
+</p>
+
+<p>
+Even though the Emacs Lisp configuration is numerically smaller to the Jekyll
+one, it's arguably slightly more complicated and well, weird. The idiosyncrasies
+of Org made it sometimes quite difficult. Despite the initial confusion, I felt
+the vastness of Org and Emacs to be empowering. I never felt there was any
+limitations to what I could have done, the full power of Org and Emacs was there
+to be invoked. Conversely, whenever tweaking Jekyll and its inner workings I
+felt severely limited. That said, Jekyll is extensible, and it has a remarkable
+<a href="https://jekyllrb.com/docs/plugins/">plugin system</a>, so it's not without merits. 
+</p>
+</div>
+
+<div id="outline-container-org0e21e05" class="outline-4">
+<h4 id="org0e21e05">Improvements</h4>
+<div class="outline-text-4" id="text-org0e21e05">
+<p>
+In the end, I felt like I gained a lot of things. These are:
+</p>
+</div>
+
+<div id="outline-container-org87d0208" class="outline-5">
+<h5 id="org87d0208">A <i>vastly</i> improved editing experience</h5>
+<div class="outline-text-5" id="text-org87d0208">
+<p>
+As shown in <a href="#markup">Markup formats, the web and you</a>, Org is far superior to any markup format. Combined with
+Babel and WYSIWYG editing preview, it is in my opinion the best format for
+authoring blog posts that pertain to programming and technical things.
+</p>
+
+<p>
+The publishing mechanism is <i>from</i> Org itself, I don't have to run an external
+script or application. All I run is a live-reloading HTTP server that I can
+browse the content every now and then. In itself this isn't that valuable, but
+when combined with the WYSIWYG aspect, I never feel like I'm supplying <i>input</i>
+to a static site generator. Instead, I feel like I'm authoring content and
+simply <i>exporting</i> it to another medium, which happens to be the web.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga2a1b9e" class="outline-5">
+<h5 id="orga2a1b9e">Did I mention Babel already?</h5>
+<div class="outline-text-5" id="text-orga2a1b9e">
+<p>
+Apart from the literate configuration, I've used Babel throughout this document.
+It's used to render the directory structure <a href="#dir">in the beginning</a>. Perhaps the
+coolest part is the meta-programming ability: I can essentially capture <i>any</i>
+Babel evaluation and capture it as a variable, and pass it as a <a href="https://orgmode.org/manual/var.html">variable</a> to any
+source block, <i>from</i> any <i>to</i> any language! For instance, I can generate tabular
+data using a shell command, and Org automatically parses it as a table. Then, I
+can pass this table to R, and do all sorts of <a href="https://orgmode.org/worg/org-tutorials/org-R/org-R.html">wizardry</a>.
+</p>
+
+<p>
+The usefulness of this is of course debatable. But it's fun, at least, I see a
+practical example in using a combination of Python and R to create interesting
+graphs and plots.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org73a1daa" class="outline-4">
+<h4 id="org73a1daa">Things I got rid of</h4>
+<div class="outline-text-4" id="text-org73a1daa">
+<p>
+There are some things that I don't have anymore that I won't really miss.
+</p>
+</div>
+
+<div id="outline-container-org46aee98" class="outline-5">
+<h5 id="org46aee98">Debugging Liquid templates</h5>
+<div class="outline-text-5" id="text-org46aee98">
+<p>
+Your complicated pipe operation has a <code>null</code> somewhere in it? Yeah, you get an
+empty page! Everybody gets an empty page! Debugging Liquid was one of the
+biggest pain points of Jekyll. Now I can just <code>C-u C-M-x</code> on an Elisp code block
+to instrument it for debugging and I have an interactive debugger. With Liquid I
+had to do all sorts of <code>printf</code> debugging which didn't feel very smart.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org21de49b" class="outline-5">
+<h5 id="org21de49b">Templating</h5>
+<div class="outline-text-5" id="text-org21de49b">
+<p>
+The new setup is more or less a WYSIWYG dump of what I have in the editor,
+before, all markup and layout was hard to read because it was interposed with
+markup and templating. With Org the need for templating is absolutely minimal.
+</p>
+
+<p>
+I freely admit I don't miss Liquid that much, but it did have handy access to
+with Org requires something slightly more complicated.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org45b6f12" class="outline-3">
+<h3 id="org45b6f12">Summary and benchmarks</h3>
+<div class="outline-text-3" id="text-org45b6f12">
+<p>
+All in all, I can safely admit that the user experience has been positively
+improved. While I had to do lots of fun Emacs Lisp hacking, the hackery never
+felt unnatural as it would have felt with Jekyll and Liquid, it was <i>supported</i>:
+Org actually encourages to do whatever you want with it. The only limitations
+that ultimately are there are Emacs Lisp, and failing that, you can invoke Babel
+to run <i>anything</i>. 
+</p>
+
+<p>
+I was also interested in the performance of Org vs. Jekyll, so let's analyze
+that, too.
+</p>
+
+<div class="float-sm-right">
+<div class="d-sm-inline">
+<div class="ml-sm-3">
+<p>
+
+</p>
+
+
+
+<figure>
+<img src="../assets/images/perf.png" alt="perf.png">
+
+</figure>
+
+</div>
+
+</div>
+
+</div>
+
+<p>
+Comparing the performance of Org and Jekyll was rather simple. I took the
+following data points:
+</p>
+
+<ul class="org-ul">
+<li>Full rebuild
+<ul class="org-ul">
+<li>For <b>org</b> I erase the <code>docs</code> directory and hit <kbd>C-u F3</kbd>,
+which invokes the publishing shortcut, but clears the org mode timestamps
+first. This removes all caches of timestamps and dates so that the
+publishing is always accurate.</li>
+<li>For <b>Jekyll</b> it's <code>rm -rf _site &amp;&amp; bundle exec jekyll build</code></li>
+</ul></li>
+<li>Incremental rebuild
+<ul class="org-ul">
+<li>For <b>org</b> it's the custom <kbd>F3</kbd> shortcut that rebuilds it
+in the editor</li>
+<li>For <b>Jekyll</b> I use <code>bundle exec jekyll serve --livereload --drafts --incremental</code></li>
+</ul></li>
+</ul>
+
+<p>
+Looking at the results, it appears that Org is about twice as slower than Jekyll
+in both cases. But we're still talking about a difference of a few seconds, so
+it's not that big of a deal.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<hr><address>Last modified on 20 March 2019. Content licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.
+</div>
+
+</div></body>
+</html>

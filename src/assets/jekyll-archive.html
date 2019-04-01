@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-1.55 in css mode. -->
+<html>
+  <head>
+    <title>year-archive.html</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #000000;
+        background-color: #ffffff;
+      }
+      .web-mode-block-control {
+        /* web-mode-block-control-face */
+        color: #483d8b;
+      }
+      .web-mode-block-delimiter {
+        /* web-mode-block-delimiter-face */
+        color: #483d8b;
+      }
+      .web-mode-block-string {
+        /* web-mode-block-string-face */
+        color: #8b2252;
+      }
+      .web-mode-comment {
+        /* web-mode-comment-face */
+        color: #b22222;
+      }
+      .web-mode-filter {
+        /* web-mode-filter-face */
+        color: #0000ff;
+      }
+      .web-mode-html-attr-equal {
+        /* web-mode-html-attr-equal-face */
+        color: #8b8989;
+      }
+      .web-mode-html-attr-name {
+        /* web-mode-html-attr-name-face */
+        color: #8b8989;
+      }
+      .web-mode-html-attr-value {
+        /* web-mode-html-attr-value-face */
+        color: #8b2252;
+      }
+      .web-mode-html-tag {
+        /* web-mode-html-tag-face */
+        color: #8b8989;
+      }
+      .web-mode-html-tag-bracket {
+        /* web-mode-html-tag-bracket-face */
+        color: #242424;
+      }
+      .web-mode-keyword {
+        /* web-mode-keyword-face */
+        color: #a020f0;
+      }
+      .web-mode-variable-name {
+        /* web-mode-variable-name-face */
+        color: #a0522d;
+      }
+
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+<span class="web-mode-block-delimiter">{%</span> <span class="web-mode-keyword">assign</span> <span class="web-mode-variable-name">collection</span> = <span class="web-mode-variable-name">include.collection</span> <span class="web-mode-block-delimiter">%}</span>
+<span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">for</span> <span class="web-mode-variable-name">post</span> <span class="web-mode-keyword">in</span> <span class="web-mode-variable-name">collection</span> <span class="web-mode-block-delimiter">%}</span>
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">capture</span> <span class="web-mode-variable-name">this_year</span> <span class="web-mode-block-delimiter">%}{{</span> <span class="web-mode-variable-name">post</span>.<span class="web-mode-variable-name">date</span> | <span class="web-mode-filter">date</span>: <span class="web-mode-block-string">"%Y"</span> <span class="web-mode-block-delimiter">}}{%</span> <span class="web-mode-block-control">endcapture</span> <span class="web-mode-block-delimiter">%}</span>
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">capture</span> <span class="web-mode-variable-name">this_month</span> <span class="web-mode-block-delimiter">%}{{</span> <span class="web-mode-variable-name">post</span>.<span class="web-mode-variable-name">date</span> | <span class="web-mode-filter">date</span>: <span class="web-mode-block-string">"%B"</span> <span class="web-mode-block-delimiter">}}{%</span> <span class="web-mode-block-control">endcapture</span> <span class="web-mode-block-delimiter">%}</span>
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">capture</span> <span class="web-mode-variable-name">next_year</span> <span class="web-mode-block-delimiter">%}{{</span> <span class="web-mode-variable-name">post</span>.<span class="web-mode-variable-name">previous</span>.<span class="web-mode-variable-name">date</span> | <span class="web-mode-filter">date</span>: <span class="web-mode-block-string">"%Y"</span> <span class="web-mode-block-delimiter">}}{%</span> <span class="web-mode-block-control">endcapture</span> <span class="web-mode-block-delimiter">%}</span>
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">capture</span> <span class="web-mode-variable-name">next_month</span> <span class="web-mode-block-delimiter">%}{{</span> <span class="web-mode-variable-name">post</span>.<span class="web-mode-variable-name">previous</span>.<span class="web-mode-variable-name">date</span> | <span class="web-mode-filter">date</span>: <span class="web-mode-block-string">"%B"</span> <span class="web-mode-block-delimiter">}}{%</span> <span class="web-mode-block-control">endcapture</span> <span class="web-mode-block-delimiter">%}</span>
+
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">if</span> <span class="web-mode-variable-name">forloop.first</span> <span class="web-mode-block-delimiter">%}</span>
+    <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">h3</span> <span class="web-mode-html-attr-name">id</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">this_year</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-html-attr-value">-ref"</span><span class="web-mode-html-tag-bracket">&gt;</span><span class="web-mode-block-delimiter">{{</span><span class="web-mode-variable-name">this_year</span><span class="web-mode-block-delimiter">}}</span><span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">h3</span><span class="web-mode-html-tag-bracket">&gt;</span>
+    <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">ul</span> <span class="web-mode-html-attr-name">class</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"list-unstyled"</span><span class="web-mode-html-tag-bracket">&gt;</span>
+      <span class="web-mode-comment">&lt;!-- &lt;li id="</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">this_year</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment">-</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">this_month</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment">-ref" class="hilink"&gt;</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">this_month</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment"> --&gt;</span>
+      <span class="web-mode-comment">&lt;!-- &lt;ul&gt; --&gt;</span>
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">endif</span> <span class="web-mode-block-delimiter">%}</span>
+
+  <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">li</span><span class="web-mode-html-tag-bracket">&gt;</span>
+    <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">div</span> <span class="web-mode-html-attr-name">class</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"row"</span><span class="web-mode-html-tag-bracket">&gt;</span>
+      <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">div</span> <span class="web-mode-html-attr-name">class</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"col-sm-3"</span><span class="web-mode-html-tag-bracket">&gt;</span>
+        <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">span</span> <span class="web-mode-html-attr-name">class</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"text-muted"</span><span class="web-mode-html-tag-bracket">&gt;</span><span class="web-mode-block-delimiter">{{</span>  <span class="web-mode-variable-name">post</span>.<span class="web-mode-variable-name">date</span> | <span class="web-mode-filter">date</span>: <span class="web-mode-block-string">"%d %B"</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">span</span><span class="web-mode-html-tag-bracket">&gt;</span>
+      <span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">div</span><span class="web-mode-html-tag-bracket">&gt;</span>
+      <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">div</span> <span class="web-mode-html-attr-name">class</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"col-sm-9"</span><span class="web-mode-html-tag-bracket">&gt;</span>
+        <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">a</span> <span class="web-mode-html-attr-name">href</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">post</span>.<span class="web-mode-variable-name">url</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-html-attr-value">"</span><span class="web-mode-html-tag-bracket">&gt;</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">post</span>.<span class="web-mode-variable-name">title</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">a</span><span class="web-mode-html-tag-bracket">&gt;</span> &amp;nbsp;
+      <span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">div</span><span class="web-mode-html-tag-bracket">&gt;</span>
+    <span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">div</span><span class="web-mode-html-tag-bracket">&gt;</span>
+  <span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">li</span><span class="web-mode-html-tag-bracket">&gt;</span>
+
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">if</span> <span class="web-mode-variable-name">forloop.last</span> <span class="web-mode-block-delimiter">%}</span>
+    <span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">ul</span><span class="web-mode-html-tag-bracket">&gt;&lt;/</span><span class="web-mode-html-tag">li</span><span class="web-mode-html-tag-bracket">&gt;</span>
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">else</span> <span class="web-mode-block-delimiter">%}</span>
+      <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">if</span> <span class="web-mode-variable-name">this_year</span> != <span class="web-mode-variable-name">next_year</span> <span class="web-mode-block-delimiter">%}</span>
+    <span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">ul</span><span class="web-mode-html-tag-bracket">&gt;</span>
+      <span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">li</span><span class="web-mode-html-tag-bracket">&gt;</span>
+    <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">h3</span> <span class="web-mode-html-attr-name">id</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">next_year</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-html-attr-value">-ref"</span><span class="web-mode-html-tag-bracket">&gt;</span><span class="web-mode-block-delimiter">{{</span><span class="web-mode-variable-name">next_year</span><span class="web-mode-block-delimiter">}}</span><span class="web-mode-html-tag-bracket">&lt;/</span><span class="web-mode-html-tag">h3</span><span class="web-mode-html-tag-bracket">&gt;</span>
+    <span class="web-mode-html-tag-bracket">&lt;</span><span class="web-mode-html-tag">ul</span> <span class="web-mode-html-attr-name">class</span><span class="web-mode-html-attr-equal">=</span><span class="web-mode-html-attr-value">"list-unstyled"</span><span class="web-mode-html-tag-bracket">&gt;</span>
+      <span class="web-mode-comment">&lt;!-- &lt;li id="</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">next_year</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment">-</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">next_month</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment">-ref" class="hilink"&gt;</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">next_month</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment"> --&gt;</span>
+      <span class="web-mode-comment">&lt;!-- &lt;ul&gt; --&gt;</span>
+      <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">else</span> <span class="web-mode-block-delimiter">%}</span>    
+          <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">if</span> <span class="web-mode-variable-name">this_month</span> != <span class="web-mode-variable-name">next_month</span> <span class="web-mode-block-delimiter">%}</span>
+            <span class="web-mode-comment">&lt;!-- &lt;/ul&gt; --&gt;</span>
+            <span class="web-mode-comment">&lt;!-- &lt;li id="</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">next_year</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment">-</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">next_month</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment">-ref" class="hilink"&gt;</span><span class="web-mode-block-delimiter">{{</span> <span class="web-mode-variable-name">next_month</span> <span class="web-mode-block-delimiter">}}</span><span class="web-mode-comment"> --&gt;</span>
+            <span class="web-mode-comment">&lt;!-- &lt;ul&gt; --&gt;</span>
+          <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">endif</span> <span class="web-mode-block-delimiter">%}</span>
+      <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">endif</span> <span class="web-mode-block-delimiter">%}</span>
+  <span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">endif</span> <span class="web-mode-block-delimiter">%}</span>
+<span class="web-mode-block-delimiter">{%</span> <span class="web-mode-block-control">endfor</span> <span class="web-mode-block-delimiter">%}</span>
+</pre>
+  </body>
+</html>

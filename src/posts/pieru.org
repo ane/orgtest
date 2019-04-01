@@ -1,0 +1,78 @@
+#+TITLE: Shit head
+#+AUTHOR: Antoine Kalmbach
+#+DATE: <2019-03-10>
+#+SUBTITLE: Fort bort short hort.
+
+See the [[file:archive.org][sitemap]]. Are you an =idiot=?
+
+#+TOC: headlines 3
+
+* It's not easy being green
+ 
+But it's fun!
+
+** Why would you though?
+
+Here's a [[http://example.org][link for you]].
+
+#+CAPTION: Derp!
+#+NAME: tab:shig
+#+ATTR_HTML: :class table table-bordered
+| Hello  | I am an idiot                     | What?     | Shit | Go Away   |
+|--------+-----------------------------------+-----------+------+-----------|
+| Shitty | Here some $\LaTeX$ for you: $x^2$ | Foo[fn:1] | Nope | **hello** |
+
+* Check out this heading
+:PROPERTIES:
+:CUSTOM_ID: bort
+:END:
+
+#+BEGIN_SRC scala
+def foo(bar: Int): Option[Int] = {
+  bar match {
+    case x if x > 0 => Some(x)
+    case _ => None
+  }
+}
+#+END_SRC
+
+
+#+BEGIN_SRC python -n
+print("hi there")
+#+END_SRC
+
+#+BEGIN_SRC R -n :results output graphics :file ../assets/images/test.png :exports both
+  library("ggplot2")
+  ggplot(iris, aes(x = Sepal.Width, y = Sepal.Length, color = Species)) +
+  geom_point()
+#+END_SRC
+
+#+RESULTS:
+[[file:../assets/images/test.png]]
+
+spatt
+
+#+BEGIN_SRC ditaa :file ../assets/images/pieru.png :exports both
+  +--------------+
+  |cPNK          |
+  | Kakki World! |
+  |              |
+  +--------------+
+#+END_SRC
+
+#+RESULTS:
+[[file:../assets/images/pieru.png]]
+
+
+See [[#bort]].
+
+* Bort is the bort
+
+  - Fart :: gas that comes out from your ass
+  - Ass :: shoulders for your ass
+  - Ass goblins of auschwitz :: scary monsters 
+
+* Footnotes
+
+[fn:1] This is a silly footnote
+

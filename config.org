@@ -1,0 +1,488 @@
+* Configuring =org-publish-project-alist=
+:PROPERTIES:
+:ID:       225F5809-E04A-495C-ACDA-3B7BCBF996D9
+:PUBDATE:  <2019-03-18 Mon 16:12>
+:END:
+
+Publication happens using @@html:<kbd>M-x</kbd> <kbd>org-publish</kbd>@@ which
+uses the value of [[https://orgmode.org/manual/Project-alist.html][=org-publish-project-alist=]]. We pass the values to the
+property list and it configures the blog.
+
+These are the elements of the configuration:
+
+#+TOC: headlines 1 local
+
+** Foundations
+:PROPERTIES:
+:CUSTOM_ID: shortcuts
+:END:
+
+So, to start with, I set up [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html][.dir-locals.el]] to have directory local variables
+specific to the blog project only:
+
+#+include: ".dir-locals.el" :src emacs-lisp
+
+This sets up two things whenever opening a file in the directory:
+
+- it sets up a keybinding for @@html:<kbd>F3</kbd>@@ to publish a project called
+  blog defined in =config.org=. It also enables a [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Command-Arguments.html][prefix argument]] for the
+  keybinding, so hitting @@html:<kbd>C-u F3</kbd>@@ clears all timestamp caches
+  from org publish. This is useful if I want to regenerate the post index or
+  archives, as those will defer to caches to get the titles and dates.
+- it sets a buffer-local variable =blog-root= used throughout the configuration
+  
+Then all we have to define is the content of =config.org=, which is a /literate
+program/ that I embed into this document.
+
+** Navigation, titles and footers
+:PROPERTIES:
+:ID:       75A0CF06-1618-4D80-B355-B32E3FFD5DF1
+:END:
+
+The configuration begins with setting the content of the HTML header. This is
+done using the property =:html-head-extra=, adds text to the =<head>= tag of the
+document, besides some standard content supplied by Org.  This adds Bootstrap
+and HyphenatorJS along with my [[file:src/assets/style.css][custom CSS]]:
+
+#+begin_src emacs-lisp +n
+(setq blog-html-head-extra
+      "<script src=\"/assets/hyphenator.js\" type=\"text/javascript\"></script>
+       <script src=\"/assets/hylo.js\" type=\"text/javascript\"></script>
+       <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">
+       <link rel=\"stylesheet\" href=\"/assets/style.css\" type=\"text/css\">")
+#+end_src
+
+*** Navigation
+:PROPERTIES:
+:ID:       8734C1A6-C55D-4792-BF87-1B99D3BF229D
+:END:
+
+The navigation bar that is shared by all pages is in the =:html-home/up-format=
+property. This is a format string with two arguments: the root directory and the
+directory above the current directory.
+
+#+begin_src emacs-lisp +n
+(setq blog-html-up
+      "<h1 class=\"my-3 mt-sm-5 h3 text-center\">Antoine Kalmbach</h1>
+       <ul class=\"nav justify-content-center mb-5\">
+         <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"%s\">Index</a>
+         </li>
+         <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"/about.html\">About</a>
+         </li>
+         <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"/archive.html\">Archive</a>
+         </li>
+         <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"/feed.xml\">RSS</a>
+         </li>
+       </ul>")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+<h1 class="my-3 mt-sm-5 h3 text-center">Antoine Kalmbach</h1>
+       <ul class="nav justify-content-center mb-5">
+         <li class="nav-item">
+          <a class="nav-link" href="%s">Index</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/about.html">About</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/archive.html">Archive</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/feed.xml">RSS</a>
+         </li>
+       </ul>
+#+end_example
+
+*** Titles
+:PROPERTIES:
+:ID:       B8EF6B4B-0B32-4CFB-8F50-F89B7B5BC593
+:END:
+
+Page and post titles are rendered using the /preamble/ defined in
+=:html-preamble=. This is a function that accepts a property list of the current
+project. I extract the title and date and render the page using standard
+Bootstrap styles.
+
+#+begin_src emacs-lisp +n
+  (defun blog-html-preamble-fmt (plist)
+    (when (plist-get plist :title)
+      (let*
+          ((dir (plist-get plist :publishing-directory))
+           (path (file-relative-name (plist-get plist :output-file) dir)))
+      
+        (format
+         "<h1 class=\"page-header\"> <a href=\"/%s\">%s</a> </h1>
+          <p class=\"text-muted post-meta\">%s</p>"
+         path
+         (car (plist-get plist :title))
+         (org-timestamp-format (car (plist-get plist :date)) "%d %B %Y")))))
+#+end_src
+
+#+RESULTS:
+: blog-html-preamble-fmt
+
+
+*** Footer
+:PROPERTIES:
+:ID:       30323E30-3135-43FD-8B12-ECAB417B7D35
+:END:
+
+The footer renders using the /postamble/ defined in =:html-postamble=. I include
+the [[https://creativecommons.org/licenses/by-sa/4.0/][CC BY-SA]] license notice, since a copyright notice is unnecessary these
+days. I relaxed the license from [[https://creativecommons.org/licenses/by-nc-sa/2.0/][CC BY-NC-SA]] since I don't really care whether
+any of my drivel is used for commercial purposes or not, especially the code examples.
+
+#+begin_src emacs-lisp +n
+(setq blog-html-down
+      "<hr><address>Content licensed under <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\">CC BY-SA 4.0</a>. Last modified on %T.")
+#+end_src
+
+#+RESULTS:
+: <hr><address>Content licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Last modified on %T.
+
+** The publishing function
+:PROPERTIES:
+:ID:       77146A29-61C8-43F7-8403-99754BA462F2
+:END:
+
+The standard Org publish function just exports the Org into HTML as-is, but I
+need some alterations. Specifically, I need a Bootstrap [[https://getbootstrap.com/docs/4.3/layout/overview/#containers][container]] to get the
+results wrapped with automatic horizontal markings. Here, at last, we have to
+resort to some glorious Lisp code to get the results I want: the body rendered
+inside a Bootstrap =.container= class. I found this from [[http://vicarie.in][Narendra Joshi]]'s blog:
+
+#+begin_src emacs-lisp +n
+  (defun blog-publish-html (plist filename pub-dir)
+    "Same as `org-html-publish-to-html' but modifies html before finishing."
+    (let ((file-path (org-html-publish-to-html plist filename pub-dir)))
+      (with-current-buffer (find-file-noselect file-path t)
+        (goto-char (point-min))
+        (search-forward "<body>")
+        (insert "\n<div class=\"container hyphenate\">\n")
+        (goto-char (point-max))
+        (search-backward "</body>")
+        (insert "\n</div>")
+        (save-buffer)
+        (kill-buffer))
+      file-path))
+#+end_src
+
+#+RESULTS:
+: blog-publish-html
+
+Org caches the timestamps and titles of posts to speed up publishing. That means
+a file that wasn't modified since the last publication won't be published. The
+shortcut defined in [[#shortcuts]] has a cache clearing option using [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Command-Arguments.html][prefix
+arguments]], but that's a bit heavy-handed since it republishes the /whole/
+blog. But it works, since I don't need to regenerate the index all the time anyway.
+
+** The post index
+:PROPERTIES:
+:ID:       6FF54B52-4825-4670-9849-1EBFA727ABE1
+:END:
+
+The blog index is generated using the sitemap function configured using
+=:sitemap-function= and =:sitemap-format-entry=. The former receives all sitemap
+entries each formatted by the latter.
+
+The formating function formats an entry for a plain unordered list, but only
+considers org files in the =posts/= directory.
+
+#+begin_src emacs-lisp +n
+  (defun blog-sitemap-format-entry (entry _style project)
+    "Return string for each ENTRY in PROJECT."
+    (when (s-starts-with-p "posts/" entry)
+      (let ((subtitle (car (org-publish-find-property entry :subtitle project 'html)))
+            (tags (org-publish-find-property entry :filetags project 'html)))
+        (format "*%s* %s %s"
+                (format "[[file:%s][%s]]"
+                        entry
+                        (org-publish-find-title entry project))
+                (format "@@html:<span class=\"text-muted\">@@ %s @@html:</span>@@ "
+                        (format-time-string "%B %e, %Y" (org-publish-find-date entry project)))
+                (format "@@html:<p class=\"mt-2\">@@ %s @@html:</p>@@" (or subtitle ""))))))
+#+end_src
+
+#+RESULTS:
+: blog-sitemap-format-entry
+
+And then the main function concatenates these posts into the index page.
+
+#+begin_src emacs-lisp +n
+  (defun blog-sitemap-function (title list)
+    "Return sitemap using TITLE and LIST returned by `blog-sitemap-format-entry'."
+    (mapconcat (lambda (li)
+                 (format "- @@html:<article>@@ %s @@html:</article>@@" (car li)))
+               (seq-filter #'car (cdr list))
+               "\n"))
+#+end_src
+
+#+RESULTS:
+: blog-sitemap-function
+
+What actually the sitemap is about is that it generates an /org/ file that is
+then also published by =org-publish=. 
+
+** The post archive
+:PROPERTIES:
+:ID:       8E896CA3-9FEE-41C4-A4B2-FC9EF6FAEF6D
+:END:
+
+The post [[file:src/archive.org][archive]]\nbsp is just an index of posts grouped by year. A naïve way of
+generating the content would be to maintain that lists by hand, but I want to
+generate this automatically.
+
+This turned out to be rather tricky! Since org does not have any sort of easy
+support for generating pages with custom content, we need a way to generate a
+post archive by year. Fortunately, you can have as many sitemaps as you want, so
+all we have to do is create a second sitemap, called /archive/. This function
+formats each entry and returns a hash table for each file containing the file
+name, date and title, and generates a file called =archive.org= and then
+the first project ("posts") grabs it and publishes it as the [[file:src/archive.org][Archive]].
+
+#+begin_src emacs-lisp +n
+  (defun blog-year-archive-sitemap-entry (entry _style project)
+    (when (s-starts-with-p "posts/" entry)
+      (let ((date (org-publish-find-date entry project))
+            (title (org-publish-find-title entry project)))
+        `(:date ,date :entry ,entry :title ,title))))
+#+end_src
+
+#+RESULTS:
+: blog-year-archive-sitemap-entry
+
+Then, the /pièce de résistance/, the following function groups them by year
+and splits them into different categories by year:
+
+#+begin_src emacs-lisp +n
+  (defun blog-year-archive-sitemap-function (title list)
+    (let* ((posts (seq-remove #'null (-flatten-n 1 (cdr list))))
+           (grouped (seq-group-by
+                     (lambda (entry)
+                       (when-let* ((date (plist-get entry :date))
+                                   (year (nth 5 (decode-time date))))
+                         year))
+                     posts)))
+      (mapconcat
+       (lambda (grp)
+         (let* ((year (car grp))
+                (posts (cdr grp)))
+           (concat
+            "#+TITLE: " title "\n"
+            "#+OPTIONS: html-preamble:nil" "\n\n"
+            (format
+             "@@html:<h4>@@ %s @@html:</h4>@@ \n @@html:<ul>@@" year)
+            (mapconcat
+             (lambda (post)
+               (let ((title (plist-get post :title))
+                     (date (plist-get post :date))
+                     (file (plist-get post :entry)))
+                 (format
+                  "@@html:<li>@@ %s %s @@html:</li>@@"
+                  (format "[[file:%s][%s]]" file title)
+                  (format
+                   "@@html:<span class=\"text-muted\">@@ %s @@html:</span>@@"
+                   (format-time-string "%d %B" date)))))
+             posts
+             "\n")
+            "@@html:</ul>@@")))
+       grouped
+       "\n")))
+
+#+end_src
+
+Even though this code appears a bit complicated, I can assure you, being just a
+functional GROUP BY operation, it is much easier to understand than
+[[file:src/assets/jekyll-archive.html][original]]\nbsp in the Jekyll version was much more difficult to reason about and
+understand.
+
+** Generating an RSS feed
+
+Getting RSS requires a third sitemap. How =ox-rss.el= works is that it parses a
+file containing top-level headlines and generates a RSS =<item>= feed out of
+them. I can't therefore use my =posts.org= or =archive.org= to generate them as
+they contain too much HTML markup and the titles are weirdly formatted
+anyway. Fortunately, [[https://writepermission.com/org-blogging-rss-feed.html][Toon Claes]] had already found a solution for this, which is
+just generating a third sitemap. This function publishes the main =feed.org=
+file, and gives it a title and then formats =list= as headings.
+
+#+begin_src emacs-lisp +n
+  (defun blog-rss-sitemap (title list)
+    "Create a RSS sitemap"
+    (concat "#+TITLE: " title "\n\n"
+            (org-list-to-subtree list '(:icount "" :istart ""))))
+#+end_src
+
+#+RESULTS:
+: blog-rss-sitemap
+
+Then we generate headings for all entries in the list. The two attributes
+=RSS_PERMALINK= and =PUBDATE= need to be set by us, because if omitted, =ox-rss=
+will try to invent suitable values for them. The publication date becomes the
+current date and time of the publication invocation and that's not correct.
+So by setting [[(pub)][PUBDATE]] we add the date from the =#+DATE= header to mark the publication date.
+
+#+begin_src emacs-lisp -r +n
+  (defun blog-rss-sitemap-entry (entry style project)
+    "Format ENTRY for the RSS feed.
+  ENTRY is a file name.  STYLE is either 'list' or 'tree'.
+  PROJECT is the current project."
+    (cond ((not (directory-name-p entry))
+           (let* ((file (org-publish--expand-file-name entry project))
+                  (title (org-publish-find-title entry project))
+                  (subtitle (org-publish-find-property entry :subtitle project 'ascii))
+                  (date (format-time-string "%Y-%m-%d" (org-publish-find-date entry project)))
+                  (link (concat (file-name-sans-extension entry) ".html")))
+             (with-temp-buffer
+               (insert (format "* [[file:%s][%s]]\n" file title))
+               (org-set-property "RSS_PERMALINK" link)
+               (org-set-property "PUBDATE" date) ;; (ref:pub)
+               (org-id-get-create)
+               (-some-> (car subtitle) ;; insert the subtitle if present
+                        (insert))
+               (buffer-string))))
+          (t entry)))
+#+end_src
+
+#+RESULTS:
+: blog-rss-sitemap-entry
+
+The post archive did not need a publishing function, since we're only interested
+in the custom sitemap. With the RSS feed we actually need one sine we have to
+call =org-rss-publish-to-rss= /once/ to generate XML from =feed.org= which is
+the sitemap. So the publisher first outputs the sitemap into =feed.org= and then
+publishes it as XML here, into =feed.xml=.  Lastly, we skip all files except
+=feed.org=, since we don't to only publish =feed.org= as XML, not the posts.
+
+#+begin_src emacs-lisp +n
+  (defun blog-rss-publishing-function (plist filename pub-dir)
+    "Publish RSS with PLIST, only when FILENAME is 'rss.org'.
+  PUB-DIR is when the output will be placed."
+    (if (equal "feed.org" (file-name-nondirectory filename))
+        (org-rss-publish-to-rss plist filename pub-dir)))
+
+#+end_src
+
+#+RESULTS:
+: blog-rss-publishing-function
+
+** The configuration
+:PROPERTIES:
+:ID:       940FF517-F228-4280-A3D4-DB29275CB521
+:END:
+
+Now we've defined all we need for the project configuration. Without further
+ado:
+
+#+begin_src emacs-lisp +n
+  (setq org-publish-project-alist
+        `(("posts"
+           :base-directory ,(concat blog-root "src/")        ;; the sources of the posts
+           :exclude ".*drafts/.*\\|feed.*"                   ;; don't publish draft posts
+           :base-extension "org"                             ;; only org files
+
+           :publishing-directory ,(concat blog-root "out/")  ;; results go here
+           :publishing-function blog-publish-html            ;; the function we use to publish
+
+           :recursive t                                      ;; publish all files recursively
+
+           :html-link-home "/"                               ;; home points here
+           :html-link-up "/"                                 ;; up as well
+           :html-head-extra ,blog-html-head-extra            ;; <head> conents
+           :html-head-include-scripts t                      ;; add org built-in js 
+           :html-head-include-default-style nil              ;; no org default css
+           :html-home/up-format ,blog-html-up                ;; the navigation menu
+           :html-preamble blog-html-preamble-fmt             ;; title (preamble) formating
+           :html-postamble ,blog-html-down                   ;; footer
+           :html-metadata-timestamp-format "%B %e, %Y %R %Z" ;; timestamps in the footer
+
+           :with-toc nil                                     ;; no toc by default
+           :with-title nil                                   ;; no title either
+           :with-date t                                      ;; has no effect either
+           :section-numbers nil                              ;; no section numbers
+           :html-doctype "html5"                             ;; fancy semantic html5 tags
+           :html-html5-fancy t                               ;; fancy the max
+           :htmlized-source t                                ;; use CSS for sources, instead of inline 
+
+           :auto-sitemap t                                   ;; publish the index
+           :sitemap-filename "posts.org"                     ;; to this file
+           :sitemap-title "Index"                            ;; with this title
+           :sitemap-style list                               ;; no effect
+
+           ;; these functions determine the style of the index
+           :sitemap-sort-files anti-chronologically
+           :sitemap-format-entry blog-sitemap-format-entry
+           :sitemap-function blog-sitemap-function
+           ;; )))
+           )
+          ("assets"
+           :base-directory ,(concat blog-root "src/assets/")
+           :base-extension "png\\|css\\|svg\\|js\\|jpg\\|gif\\|html"
+           :publishing-directory ,(concat blog-root "out/assets/")
+           :publishing-function org-publish-attachment
+           :recursive t)
+          ("archive"
+           :base-directory ,(concat blog-root "src/") ;; same files as in the previous project
+           :base-extension "org"
+           :recursive t
+
+           :publishing-function ignore ;; don't publish the files a second time
+           :publishing-directory ,(concat blog-root "out/") ;
+           :auto-sitemap t
+           :sitemap-filename "archive.org"
+           :sitemap-title "Archive"
+           :sitemap-style list
+           :sitemap-function blog-year-archive-sitemap-function
+           :sitemap-format-entry blog-year-archive-sitemap-entry
+           :sitemap-sort-files anti-chronologically)
+          ("rss"
+           :base-directory ,(concat blog-root "src/")
+           :base-extension "org"
+           :exclude ,(regexp-opt '("archive.org" "posts.org" "index.org" "about.org"))
+           :recursive t
+
+           :description "The website of Antoine Kalmbach"
+           :html-link-home "http://ane.github.io/"
+           :html-link-use-abs-url t
+           :html-link-org-files-as-html t
+           :rss-extension "xml"
+           :rss-feed-url "http://ane.github.io/feed.xml"
+           :rss-image-url "http://ane.github.io/assets/images/me.png"
+
+           :publishing-directory ,(concat blog-root "out/") ;
+           :publishing-function blog-rss-publishing-function
+
+           :auto-sitemap t
+           :sitemap-filename "feed.org"
+           :sitemap-title "Feed"
+           :sitemap-style list
+           :sitemap-function blog-rss-sitemap
+           :sitemap-format-entry blog-rss-sitemap-entry
+           :sitemap-sort-files anti-chronologically
+
+           :with-toc nil
+           :section-numbers nil)
+          ("blog"
+           :components ("assets" "archive" "rss" "posts"))))
+
+#+end_src
+
+#+RESULTS:
+| posts | :base-directory | /Users/akalmbach/code/kakka/src/ | :exclude | .*drafts/.*\ | feed.* | :base-extension | org | :publishing-directory | /Users/akalmbach/code/kakka/out/ | :publishing-function | blog-publish-html | :recursive | t | :html-link-home | / | :html-link-up | / | :html-head-extra | <script src="/assets/hyphenator.js" type="text/javascript"></script> |
+
+This creates three components for the =blog= project:
+
+- **posts**, the blog posts used to generate the [[file:src/index.org][index]]
+- **archive**, which is a secondary sitemap used to generate the [[file:src/archive.org][archive]]
+- **assets**, a project that just copies the images and other static crap to the
+  output directory
+- **rss** that publishes RSS
+
+So, now hitting either @@html:<kbd>F3</kbd>@@ will publish the =blog= project,
+which publishes everything I need. Next, it's time for something completely different.

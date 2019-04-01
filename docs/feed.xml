@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+	 xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	 xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	 xmlns:dc="http://purl.org/dc/elements/1.1/"
+	 xmlns:atom="http://www.w3.org/2005/Atom"
+	 xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	 xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	 xmlns:georss="http://www.georss.org/georss"
+     xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+     xmlns:media="http://search.yahoo.com/mrss/"><channel>
+  <title>Feed</title>
+  <atom:link href="http://ane.github.io/feed.xml" rel="self" type="application/rss+xml" />
+  <link>http://ane.github.io/</link>
+  <description><![CDATA[The website of Antoine Kalmbach]]></description>
+  <language>en</language>
+  <pubDate>Wed, 20 Mar 2019 23:10:05 +0200</pubDate>
+  <lastBuildDate>Wed, 20 Mar 2019 23:10:05 +0200</lastBuildDate>
+  <generator>Emacs 25.2 Org-mode 9.2.2</generator>
+  <webMaster>ena@hyperion (nil)</webMaster>
+  <image>
+    <url>https://orgmode.org/img/org-mode-unicorn-logo.png</url>
+    <title>Feed</title>
+    <link>http://ane.github.io/</link>
+  </image>
+
+
+  <item>
+    <title>Using Emacs and Org to publish a blog</title>
+    <link>http://ane.github.io/posts/emacs-and-org.html</link>
+    <author>ena@hyperion (nil)</author>
+    <guid isPermaLink="false">http://ane.github.io/posts/emacs-and-org.html</guid>
+    <pubDate>Wed, 20 Mar 2019 00:00:00 +0200</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Configurability</title>
+    <link>http://ane.github.io/posts/configuration.html</link>
+    <author>ena@hyperion (nil)</author>
+    <guid isPermaLink="false">http://ane.github.io/posts/configuration.html</guid>
+    <pubDate>Thu, 14 Mar 2019 00:00:00 +0200</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Shit head</title>
+    <link>http://ane.github.io/posts/pieru.html</link>
+    <author>ena@hyperion (nil)</author>
+    <guid isPermaLink="false">http://ane.github.io/posts/pieru.html</guid>
+    <pubDate>Sun, 10 Mar 2019 00:00:00 +0200</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+</channel>
+</rss>

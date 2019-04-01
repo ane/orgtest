@@ -1,0 +1,574 @@
+#+TITLE: Using Emacs and Org to publish a blog
+#+SUBTITLE: I converted my blog from Jekyll to be published using Emacs and Org. To say it was an interesting endeavor is an understatement.
+#+DATE: <2019-03-20>
+#+OPTIONS: num:t H:5
+
+Wiring up your own static site creator could be seen as a rite of passage for
+the modern programmer. The ultimate [[http://catb.org/jargon/html/Y/yak-shaving.html][yak shave]], I ended up redoing the static
+site generation engine for this blog using [[https://orgmode.org/][Org mode.]] Org is an [[https://www.gnu.org/software/emacs/][Emacs]] package for
+many, many things. One of these is [[https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][publishing HTML pages]], so it can be used to
+generate static HTML sites. This document details the process I went through
+doing the conversion, and explains the background and reasoning for them.
+
+#+TOC: headlines 3
+
+* Introduction
+
+I've been an Emacs user since 2009. I started using it at university to write
+LaTeX notes for maths, and wrote all sorts of papers and theses with it. These
+days I use it to keep notes, to-do lists and sketch all sorts of diagrams and
+presentations. I don't use it for programming in my day job, the folks at
+[[https://www.jetbrains.com/][JetBrains]] still have the edge when it comes to Scala and Java development
+environments. That said, when it comes to /fun/, such as Lisp or Haskell
+programming, I use Emacs.
+
+Last year, I found that Org has extensive [[https://www.gnu.org/software/emacs/manual/html_node/org/HTML-export.html][HTML exporting support]]. The same
+system is used in what Org calls [[https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][publishing projects]]. This can be harnessed into
+a powerful static site generator that benefits from Org's superb editing
+capabilities and Emacs' built-in extensive flexibility and configurability.
+
+This post is a three-part detail of my journey where I converted my blog to use
+Emacs and Org to publish this blog instead of [[https://jekyllrb.com/][Jekyll]]. It consists of two parts,
+the section [[#markup]] is where I explain my motivations in making the switch to
+Org. Then the section [[#configuring]] explains how I did it, and finally
+[[#conclusion]] is a discussion and analysis of the whole process.
+
+* Markup formats, the web, and you
+:PROPERTIES:
+:CUSTOM_ID: markup
+:END:
+
+Some people prefer to edit and publish blog posts using some sort of WYSIWYG
+editor, such as Wordpress or Blogger. I find editing raw documents using markup
+much more interesting. I want to have as much control as possible when authoring
+documents for the web. Already in university, working on my [[https://jyx.jyu.fi/handle/123456789/44048?locale-attribute=en][master's thesis,]] I
+probably spent as much time formatting the $\LaTeX$ output as I spent on writing
+content or research. 
+
+While WYSIWYG undoubtedly is the most intuitive way to process documents for the
+human mind, it has its problems. WYSIWYG sometimes gets in your way and its
+usability tends to limit the customizability of the output. That said, I don't
+think anyone is able to render $\TeX$ or /in their head/, so clearly there is
+some value in having an /unobtrusive/ markup format. So what you need is a
+markup format that is both inconspicuous and powerful. HTML is powerful, but not
+inconspicuous. You can do anything you want, but your text is full of tags. The
+same applies for $\TeX$. Conversely, Markdown and Textile are inconspicuous, but
+they are arguably not as powerful as HTML or $\TeX$.
+
+So what sort of balance between power and readability does one need? It quickly
+turns out markup languages are a pandora's box of their own: there are dozens of
+formats, and there are dozens of static site generators supporting each
+multitudes of markup formats, creating an enormous amount of combinations of
+engine and markup language.
+
+** The quest for proper markup
+
+There are dozens and dozens of markup languages out there, but only few satisfy
+my needs. Markdown is of course the bare minimum with its unobtrusive syntax,
+but as one starts requiring more advanced features, it can no longer keep up.
+
+So, without further ado, here are things I absolutely require from a markup
+language for writing blog posts or technical documents:
+
+- *Cross referencing*. I need to /easily/ create inline anchors and
+  cross-reference them using links that automatically generate a link, so that
+  if I add an anchor to a heading, and update its title, the change is reflected
+  at the link site.
+- *PlantUML, graphviz, ditaa support*. The ability to embed graphviz source code
+  to generate graphs and images inline is a really nice thing to have.
+- *Table of contents*. A no-brainer. Long posts like these require a table of
+  contents to make reading the text easier.
+- *LaTeX support*. Sometimes I need to print some math, so LaTeX via MathJax is
+  a must have.
+- *Inline HTML and CSS*. Markups have their limits. Sometimes you need to add
+     raw HTML to get what you want, and this has to be as lightweight as
+     possible.
+     
+So after reviewing multiple formats, I narrowed it down to four:
+
+- [[https://github.github.com/gfm/][Github Flavored Markdown]]
+- [[https://asciidoctor.org/docs/asciidoc-writers-guide/][Asciidoctor]] (I was already using this)
+- [[http://docutils.sourceforge.net/rst.html][reStructuredText]]
+- [[https://orgmode.org/][Org]]
+
+This gave me the following chart:
+
+#+ATTR_HTML: :class table table-bordered
+| Feature  | Cross references | PlantUML etc. generation | TOC | LaTeX | HTML & CSS | Emacs mode?   |
+|----------+------------------+--------------------------+-----+-------+------------+---------------|
+| GFM      | not natively     | not natively             | no  | yes   | yes        | [[https://jblevins.org/projects/markdown-mode/][markdown-mode]] |
+| AsciiDoc | yes              | yes, asciidoctor-diagram | yes | yes   | yes        | not really    |
+| rST      | yes              | yes, Sphinx              | yes | yes   | yes        | [[http://docutils.sourceforge.net/docs/user/emacs.html][rst-mode]]      |
+| Org      | yes              | yes, Babel               | yes | yes   | yes        | built-in      |
+
+As can be seen, only rST and Org satisfy all requirements, but in blog support
+in Sphinx is an afterthought and I dislike its syntax compared to Org.
+
+** Why org is my favourite format
+
+The reason for my switch was actually really simple. I very, very much hated
+editing [[https://asciidoctor.org/][AsciiDoc]]. That is not to say AsciiDoc is a bad format, on the contrary,
+of all the numerous [[https://en.wikipedia.org/wiki/Comparison_of_document_markup_languages][markup languages]] out there, it is by far the best, or well,
+/second best/. Org markup is more or less similar, with some superficial
+differences, but there is one absolutely major difference:
+
+Editing Org documents is pure, computerized bliss. It never gets in your way,
+and the advanced [[https://orgmode.org/manual/Global-and-local-cycling.html#Global-and-local-cycling][visibility cycling]] options make it easy to hide some of the
+markup. I have found that almost all markup languages tend to get in your
+way. The most glaring offender is links: in Markdown, the format is =[link
+title](http://url)=, in AsciiDoc it's =http://url[link title]=. Otherwise both
+markup languages are easy to read and do not intrude too much on the reader. 
+
+@@html:<div class="half float-sm-right ml-sm-5">@@
+
+#+NAME: fig:wysiwyg
+#+CAPTION: Clickable links. Yay!
+[[file:../assets/images/wysiwyg.png]]
+
+@@html:</div>@@
+
+It would be insane to claim that markup languages should have /no markup/ — that
+would be impossible — but where Org does better is having a sort of WYSIWYG
+capability for displaying links. The links are natively clickable inside Emacs,
+which makes it easy to not only navigate through your notes or personal wikis,
+but makes linking across blog posts easy. The only way to link to a blog post,
+besides using raw URLs, was to do something like =link:{% post_url
+2019-03-02-foo-bar %}[Post title]=. In Org I @@html:<kbd>C-c C-l</kbd>@@ and I
+have automatic file completion for the org files in my directory, and the links
+are clickable and intrude no markup on the text, as can be seen in the above
+screenshot.
+
+Futhermore, there were no good AsciiDoc editing modes out there. I found several
+([[https://github.com/sensorflo/adoc-mode][one]] [[https://github.com/jmquigley/asciidoc-mode][two]] [[https://github.com/emanchado/asciidoc-mode][three]]) for Emacs, but they were all subpar, so I [[https://github.com/ane/emacs.d/blob/master/asciidoc.el][wrote my own.]] I tried
+plugins for [[https://code.visualstudio.com/][VS Code]] but it came nowhere near the functionality of Org.
+
+What truly sets Org apart is that it makes so many things that are commonplace
+with other markup languages completely unnecessary. Things like /live reloading/ 
+pages when you save them in the editor and the browser watches and reloads the
+page for you is unnecessary in org. In other markup formats it's one of the
+/must-have nice-to-haves/, since you're often left wondering how your markup
+trick looks like in the HTML output. Conversely, in org, the editing view of Org is an extremely
+accurate representation of the HTML output, so there is no need for this. Org
+can display inline images and renders tables so beautifully (did I mention it
+has spreadsheets?), so livereloading is simply a thing I don't need anymore.
+
+That said, I do keep a =python3 -m http.server= in the background, but where
+before I had a split-screen view of the editor and the browser, now the browser
+is just out there somewhere, and I only intermittently watch its output.
+
+*** Babel
+
+I'm a massive fan of [[https://orgmode.org/worg/org-contrib/babel/intro.html][org-babel]], which is a literate programming environment
+extension for Org. In short, it lets me do two important things:
+
+- **Weaving**: edit source code blocks in their /native modes/ using
+  @@html:<kbd>C-c '</kbd>@@, and
+- **Tangling**: /run/ the source code blocks to produce output, such as PlantUML, graphviz,
+  Python, R and /embed the results/ into the document
+
+Editing in the native mode gives me correct indentation, syntax highlighting and
+plugins. Emacs' [[https://github.com/defunkt/markdown-mode][markdown-mode]] has a setting
+=markdown-fontify-code-blocks-natively= but this only gives syntax highlighting,
+not actual editing support. Having the major mode for the language gives me
+syntax highlighting, plugins, indentation, and so forth -- I'm no longer writing
+Markdown or AsciiDoc interspersed with code fragments, I'm writing code
+fragments with interspersed body text!
+
+So, for example, given the following source code block, after hitting
+@@html:<kbd>C-c C-c</kbd>@@ inside the source block, it produces the image right below:
+
+#+begin_src dot :file ../assets/images/foo.svg :exports both
+  digraph {
+    a -> b;
+    b -> c;
+    c -> a;
+    d -> b;
+  }
+#+end_src
+
+#+RESULTS:
+[[file:../assets/images/foo.svg]]
+
+
+Of all literate programming environments out there, this is by /far/ the sanest
+way to integrate multi-language environments. I'm very fond of drawing all sorts
+of diagrams to assist my exposition, so the ability to use Babel to draw images
+is wonderful. I can use it to [[https://orgmode.org/worg/org-tutorials/org-R/org-R.html][generate R plots]] or run [[https://orgmode.org/worg/org-contrib/babel/languages.html][many more languages]]. I can
+even keep sessions to create real [[https://orgmode.org/manual/session.html][literate programming]] examples.
+
+*** CSS tricks
+
+Invoking CSS is easy enough. I use [[http://getbootstrap.com][Bootstrap]] to style and theme this site, and
+it provides handy [[https://getbootstrap.com/docs/4.1/utilities/float/][float]] and [[https://getbootstrap.com/docs/4.1/utilities/sizing/][sizing]] classes. Invoking this is easy enough in
+various languages:
+
+**Org**
+#+BEGIN_EXAMPLE 
+#+BEGIN_float-sm-right
+Lorem ipsum dolor sit amet.
+#+END_float-sm-right
+#+END_EXAMPLE
+
+**AsciiDoc**
+#+BEGIN_SRC asciidoc
+[.float-sm-right]
+Lorem ipsum dolor sit amet.
+#+END_SRC
+
+**GFM (Kramdown)**
+#+BEGIN_SRC markdown
+Lorem ipsum dolor sit amet.
+{:.float-sm-right}
+#+END_SRC
+
+As can be seen, all three formats allow for using custom CSS to style
+paragraphs. I like to use floating images to increase readability and fluidness
+of text.
+
+** Alternatives to using Org exporting
+
+Using Org itself to publish the blog seemed like a crazy idea at first. I could
+have simply enjoyed the editing experience by first editing the files in Org,
+and then using either [[https://github.com/emacsmirror/ox-asciidoc][export it to AsciiDoc using ox-asciidoc]] or use Pandoc to
+handle the conversion.
+
+The nice part about Babel is that it when publishing the HTML files using
+org-publish, it runs the Babel code blocks and exports the images as
+well. So it produces the =.html= file and then all =png=, =svg= etc. files are
+also copied to the right directories automatically. Pandoc isn't able to do
+this: first, I have to tangle (i.e. run) all source blocks to produce the
+images, then I have to convert the file to AsciiDoc using =pandoc -s -t post.org
+-o post.asciidoc=, and /then/ I have to copy all the images to the right place
+and check the images work. Org handles this in one go.
+
+*** Pandoc: convert anything to anything
+
+Indeed, Pandoc is brilliant, I saw no flaw in its org to asciidoc conversion
+capabilities. It even handles $\LaTeX$ brilliantly! Similarly, the org extension
+above was more than enough.
+
+At this point I must confess that while I could make a sound argument for using
+Org to /edit/ documents, it becomes clear that I don't have to use it to
+/publish/ documents. I could have either kept my Jekyll workflow as-is, and just
+used Pandoc to churn the Org into AsciiDoc. Indeed, it would have been a
+win-win, I would have gained the superior editing of Org and while retaining the minimalism and
+flexibility of Jekyll.
+
+In the end, Pandoc wasn't able to handle the CSS classes when converting from
+Org to AsciiDoc so I ended up rejecting the org to Pandoc to Jekyll workflow.
+Then, I tried the different exporting backends for org.
+
+*** Exporting org to another system
+
+Org has fantastic support for [[https://orgmode.org/manual/Exporting.html][exporting]], which supports babel. This is an
+/almost/ perfect solution. Many of the backends are really good. Turns out I had
+a lot of options:
+
+- [[https://orgmode.org/manual/Markdown-export.html][=org-md-export-to-markdown=]] :: Export the file as Markdown. So the flow would
+     have been org \to markdown \to jekyll.
+- [[https://github.com/larstvei/ox-gfm][=ox-gfm=]] :: Export the file as Github Flavoured Markdown, the same flow as above.
+- [[https://ox-hugo.scripter.co/][=ox-hugo=]] :: Export to [[https://gohugo.io/][Hugo]]. I would have to start using Hugo to build the
+     site, altering the flow to org \to hugo markdown \to hugo.
+- [[https://github.com/gonsie/ox-jekyll-md][=ox-jekyll=]] :: Export as Jekyll, retaining the same flow as the first one but
+     with [[https://jekyllrb.com/docs/front-matter/][the front matter]] done for me.
+- [[https://github.com/emacsmirror/ox-asciidoc][ox-asciidoc]] :: Export as AsciiDoc, so altering the existing org \to asciidoc \to
+     jekyll flow.
+     
+Before doing the conversion to Org, my workflow was to write in AsciiDoc and
+then use Jekyll. So by using Org as the editing system but not the ultimate
+publication system would have been fine, since Jekyll was already there, except
+for one tiny problem: custom CSS classes was totally unsupported by almost all
+backends. =ox-gfm= was the only backend that actually ported back the classes I
+had, but it omitted styling from certain elements (tables), so eventually I
+rejected it as well. It's still the best out of all five, and I came /very/
+close to not switch to org publishing.
+
+Hugo has native support for Org but not for Babel, so it obviously cannot run
+the source blocks. The same is with Jekyll and its various org
+converters. Additionally, those systems didn't support the conversion of CSS
+classes so they were out of the game quickly.
+
+*** Shave a different yak: asciidoc-mode
+
+One alternative would have been to improve my own AsciiDoc package for
+Emacs. Now it's just a collection of shitty regexps that can highlight bold,
+italics, links and listings, but not much else.
+
+Improving the package was indeed an alternative but all in all it I found org to
+be simply amazing to work with, and having felt the greatness of org, I was
+keenly aware of how getting AsciiDoc editing to the same level would have been a
+/herculean/ effort.
+
+So in the end, Org won. I was extremely biased in its favor and could justify
+its use -- to myself -- objectively enough to warrant its use. 
+
+** Conclusion: Org has it all
+
+Babel. Inline CSS. Semi-WYSIWYG editing. Extensive $\LaTeX$ support. Org has it
+all, and even if many came close, none came /close enough/ for me. Which is why
+I proceeded to build my blog generation using Org and the power of Emacs Lisp.
+
+* Org as a static site generator
+:PROPERTIES:
+:CUSTOM_ID: configuring
+:END:
+
+With Org's built-in publishing functionality, setting up a blog was stupidly
+easy at first. Getting any Org file out as HTML was easy, but to recreate my
+custom pages, the [[file:~/code/kakka/src/index.org][Index]] and [[file:~/code/kakka/src/archive.org][Archive]], I had to resort to some Emacs Lisp hacking.
+
+Thankfully, I could stand on the shoulders of giants. I followed the great
+examples of [[http://vicarie.in][Narendra Joshi]] and [[https://www.brautaset.org/][Stig Brautaset]], which helpfully provided their
+org publishing configuration in their blog posts. What I needed were four
+elements:
+
+- An index page to show new posts with their summaries
+- An 'about' page
+- A post archive grouped by year
+- RSS
+
+All of these were fairly easy to implement. The interesting part is I was able
+to do this using /literate programming/, specifically, the contents of the
+configuration for Org publish is just an ordinary Org file with interleaved
+Emacs Lisp that gets interpreted as the configuration!
+
+** Literate configuration
+
+The contents of =config.org= is actually a literate Emacs Lisp file with Org
+commentary. Babel interprets the Lisp code inside as if it were a plain Lisp
+file. It's used to configure this blog! How cool is that? I include the
+contents of that file into the next section as-is, the result of this is the
+configuration I display in this org document is always up-to-date, because /it
+is/ the configuration for this blog by which this very text is published!
+  
+The load script has to find the directory of =config.org= by using the location of
+=.dir-locals.el=, since directly using =(load-file "config.org")= doesn't work, as the
+variables set in .dir-locals.el are specific to the /buffer being opened/, so
+the current directory is the directory of the file being visited, not the root
+folder. Additionally, [[https://github.com/bbatsov/projectile][projectile]] loads the directory locals file when visiting
+the project, so we need to see if we have a buffer open, otherwise we use the
+=default-directory= variable which projectile automatically sets for us to the
+project root directory.
+
+This lets me keep all the blog code in =config.org= in the blog project, instead of
+adding it into my =~/.emacs.d= folder. 
+
+*** The directory structure
+:PROPERTIES:
+:CUSTOM_ID: dir
+:END:
+
+I split the output into =out= and the code lives inside =src=. This is the
+directory structure, provided by calling =tree= from Babel:
+
+#+begin_src shell :results output :exports results
+tree -a -I "out|.git" -L 3 ../../ | tail -n +2 
+#+end_src
+
+The =src= directory is the source of the blog, and the =out= directory contains
+the static HTML to be uploaded.
+
+Now we're ready to take a look at the configuration itself.
+
+#+INCLUDE: "../../config.org" :minlevel 2
+
+** Deployment
+
+I'm still using Github Pages, and it has for some years had the support for
+hosting your html content from the =docs= directory in the master branch. So
+now you don't need anything complicated to publish your content there. Before,
+I used a weird Travis CI setup that built the site and then overwrote the master
+branch with the published data. That felt weird. The content changes too rarely
+to justify CI, so I contend myself with just committing the directory and
+pushing it to Git. I mean, I could have started doing that with Jekyll as well,
+but the Travis CI thing I had worked just fine. The =docs/= change became
+available /after/ I had already built the Travis CI script.
+
+* Migration from Jekyll
+
+So now that the configuration itself is ready, I need to convert all existing
+posts into org using pandoc. Conversion was tricky. Part of my posts [[file:the-joy-of-asciidoc.org][are now in
+AsciiDoc]] and the rest is in Markdown. Pandoc can handle Markdown \to Org quite
+easily, on the other hand it cannot convert /from/ AsciiDoc (it can produce
+AsciiDoc just fine). So I had to use asciidoctor:
+
+#+begin_src shell
+asciidoctor -b docbook post.asciidoc -o - | pandoc -f docbook -t org -s -o post.org
+#+end_src
+
+but for Markdown files a simple =pandoc -f gfm post.md -t org -o post.org= was
+sufficient.
+
+I also had to set up redirections: my Jekyll posts all were using the standard
+Jekyll format of =/YYYY/MM/DD/post-title.html=. I have found some people linking
+to my posts, even a [[https://www.semanticscholar.org/paper/An-Analysis-and-Discussion-of-Solutions-to-the-Tian-Wei/dd109b780f300f5d7259a85a67447d4d0d5b1914?navId=references][research paper]] (!?) pointing to one blog post. I want those
+links to be eternal, so I had to add a redirect page for all posts.
+
+* Conclusion
+:PROPERTIES:
+:CUSTOM_ID: conclusion
+:END:
+
+/TL;DR: Gets mad at Jekyll, writes 500 lines of Emacs Lisp, thinks things are
+better now./
+
+This section concludes with an analysis of what went into the conversion and how
+I felt about it. I try to be as objective as can, and I will most likely won't
+be, but I don't care!
+
+What about the complexity of the overall solution? Was Org really hassle-free?
+Currently, there are about 300 lines of Emacs Lisp in the configuration to
+generate this blog. The old Jekyll setup is about 600 hundred lines, including
+layouts, the blog index, the post archive and many more.
+
+Even though the Emacs Lisp configuration is numerically smaller to the Jekyll
+one, it's arguably slightly more complicated and well, weird. The idiosyncrasies
+of Org made it sometimes quite difficult. Despite the initial confusion, I felt
+the vastness of Org and Emacs to be empowering. I never felt there was any
+limitations to what I could have done, the full power of Org and Emacs was there
+to be invoked. Conversely, whenever tweaking Jekyll and its inner workings I
+felt severely limited. That said, Jekyll is extensible, and it has a remarkable
+[[https://jekyllrb.com/docs/plugins/][plugin system]], so it's not without merits. 
+
+Lastly, the whole thing is in its own way completely self-contained. Aside from
+the external language runtimes, there are no dependencies beyond Emacs and
+Org. So the three hundred lines you see here are /all of it/.
+
+** Improvements
+
+In the end, I felt like I gained a lot of things. These are:
+
+- *A /vastly/ improved editing experience*. As shown in [[#markup]], Org is far
+  superior to any markup format. Combined with Babel and WYSIWYG editing
+  preview, it is in my opinion the best format for authoring blog posts that
+  pertain to programming and technical things.
+
+  The publishing mechanism is /from/ Org itself, I don't have to run an external
+  script or application. All I run is a live-reloading HTTP server that I can
+  browse the content every now and then. In itself this isn't that valuable, but
+  when combined with the WYSIWYG aspect, I never feel like I'm supplying /input/
+  to a static site generator. Instead, I feel like I'm authoring content and
+  simply /exporting/ it to another medium, which happens to be the web.
+
+- *Babel*. Apart from the literate configuration, I've used Babel throughout
+  this document.  It's used to render the directory structure [[#dir][in the
+  beginning]]. Perhaps the coolest part is the meta-programming ability: I can
+  essentially capture /any/ Babel evaluation and capture it as a variable, and
+  pass it as a [[https://orgmode.org/manual/var.html][variable]] to any source block, /from/ any /to/ any language! For
+  instance, I can generate tabular data using a shell command, and Org
+  automatically parses it as a table. Then, I can pass this table to R, and do
+  all sorts of [[https://orgmode.org/worg/org-tutorials/org-R/org-R.html][wizardry]].
+
+  The usefulness of this is of course debatable. But it's fun, at least, I see
+  a practical example in using a combination of Python and R to create
+  interesting graphs and plots.
+
+** Things I got rid of
+
+There are some things that I don't have anymore that I won't really miss.
+
+- *Debugging Liquid templates*. Your complicated pipe operation has a =null=
+  somewhere in it? Yeah, you get an empty page! Everybody gets an empty page!
+  Debugging Liquid was one of the biggest pain points of Jekyll. Now I can just
+  =C-u C-M-x= on an Elisp code block to instrument it for debugging and I have
+  an interactive debugger. With Liquid I had to do all sorts of =printf=
+  debugging which didn't feel very smart.
+
+- *Templating*. The new setup is more or less a WYSIWYG dump of what I have in
+  the editor, before, all markup and layout was hard to read because it was
+  interposed with markup and templating. With Org the need for templating is
+  absolutely minimal. I freely admit I don't miss Liquid that much, but it did
+  have handy access to with Org requires something slightly more complicated.
+
+
+** Data                                                           :noexport:
+
+#+CAPTION: Performance of actions in seconds, lower is better.
+#+ATTR_HTML: :class table 
+#+TBLNAME: perf
+| Engine | Full rebuild | Incremental rebuild |
+|--------+--------------+---------------------|
+| Org    |       11.756 |                 3.7 |
+| Jekyll |        6.345 |                1.70 |
+
+** Summary and benchmarks
+
+I was also interested in the performance of Org vs. Jekyll, so let's analyze
+that, too. I /felt/ no major slow-downs but I know better than to trust my gut
+when it comes to performance analysis and confirmation bias.
+
+@@html:<div class="float-sm-right half ml-sm-3">@@
+
+#+header: :file ../assets/images/perf.png
+#+begin_src R :var inp=perf :results output graphics :exports results
+  m <- as.matrix(inp[-1])
+  rownames(m) <- inp$Engine 
+  p <- barplot(m,
+          beside=TRUE,
+          col=c("#006688", "#68beaf"),
+          names.arg=c("Full", "Incremental"),
+          main="Build performance, lower is better",
+          ylab="Seconds",legend=inp$Engine,
+          ylim=c(0, 15))
+  text(p, m+1, labels=as.character(m))
+#+end_src
+
+#+RESULTS:
+[[file:../assets/images/perf.png]]
+
+@@html:</div>@@
+
+Comparing the performance of Org and Jekyll was rather simple. I took the
+following data points:
+
+- Full rebuild
+  - For *org* I erase the =docs= directory and hit @@html:<kbd>C-u F3</kbd>@@,
+    which invokes the publishing shortcut, but clears the org mode timestamps
+    first. This removes all caches of timestamps and dates so that the
+    publishing is always accurate.
+  - For *Jekyll* it's =rm -rf _site && bundle exec jekyll build=
+- Incremental rebuild
+  - For *org* it's the custom @@html:<kbd>F3</kbd>@@ shortcut that rebuilds it
+    in the editor
+  - For *Jekyll* I use =bundle exec jekyll serve --livereload --drafts --incremental=
+
+Looking at the results, it appears that Org is about twice as slow as Jekyll in
+both cases. But we're still talking about a difference of a few seconds, so it's
+not that big of a deal, and the incremental build is still in the single
+digits. With Org I feel I don't need to build that often: the input format is so
+easy to read that there is no need to render anything.
+
+** Final thoughts
+
+All in all, I can safely admit that the user experience has been positively
+improved. While I had to do lots of fun Emacs Lisp hacking, the hackery never
+felt unnatural as it would have felt with Jekyll and Liquid, it was /supported/:
+Org actually encourages to do whatever you want with it. The only limitations
+are that of Emacs Lisp, and failing that, you can invoke Babel to run
+/anything/.
+
+My original reason for doing this was to get an improved editing experience. Now
+I have it, and I have an improved blogging experience as well. Perhaps time will
+tell if I should have tried to improve the editing mode I was using before, but
+at this point I don't care.
+
+Granted, I had to conjure some three hundred lines of Emacs Lisp to get this
+thing working. Compare that to Jekyll, which is basically a few commands and
+some minor tweaks to =config.yml=, getting this done using Org was a lot more
+complicated, and I do not recommend it to the faint of heart. I knew /exactly/
+what I was getting into, plenty of blogs out there exist that detail similar
+experiences and feats to get this thing working.
+
+Most of the work was actually spent on converting old posts, as pandoc and
+asciidoctor weren't totally accurate. I had to fix a lot of details, most of
+which were my zany CSS customizations that were obviously untranslatable to the
+end format. In total, I spent about a week of getting everything ready, in about
+30 to 90 minutes per coding session.
+
+That said, I have absolutely zero regrets, and if you're fan of Org and desire
+something better than =markdown-mode=, I truly recommend giving Org publishing a
+try.
+
+Where to go from here? Well, perhaps I could implement the support for tags, so
+that you could browse a list of posts per tag. That's not terribly difficult,
+just another sitemap that calls =seq-group-by= and farts a =$TAG.org= file. 

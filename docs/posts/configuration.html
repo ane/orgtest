@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 20 March 2019 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configurability</title>
+<meta name="generator" content="Org mode">
+<script src="/assets/hyphenator.js" type="text/javascript"></script>
+       <script src="/assets/hylo.js" type="text/javascript"></script>
+       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+       <link rel="stylesheet" href="/assets/style.css" type="text/css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div class="container hyphenate">
+
+<h1 class="my-3 mt-sm-5 h3 text-center">Antoine Kalmbach</h1>
+       <ul class="nav justify-content-center mb-5">
+         <li class="nav-item">
+          <a class="nav-link" href="/">Index</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/about.html">About</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/archive.html">Archive</a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/feed.xml">RSS</a>
+         </li>
+       </ul><div id="preamble" class="status">
+<h2 class="page-header"> <a href="/posts/configuration.html">Configurability</a> </h2>
+        <p class="text-muted post-meta">14 March 2019</p>
+</div>
+<div id="content">
+<p>
+This post is a part of series on link:{% post<sub>url</sub>
+2018-04-26-software-customization %}[software product customization].
+Here, I present a method that avoid customization entirely: instead of
+customizations, behavioral changes are controlled by configuration. The
+start-time or build-time parameters of the product determine its
+behavior. To use a car analogy, a flip of a button in car can swap its
+leathter seats with
+<a href="https://en.wikipedia.org/wiki/Alcantara_(material)">Alcantara</a>
+instantly. This feature is part of the car itself, and doesn't require
+building a product line for leather seated cars and another for
+Alcantara cars at the car factory.
+</p>
+
+<p>
+Shipping a software product that integrates into a lot of systems is
+hard, because these systems vary from customer to customer. In most
+cases, these systems have different integrations mechanisms, protocols,
+locations. For example, a web shop product might integrate into the
+customer's shipping and logistics system. One customer could rely on
+UPS, the other on DHL, the other on the national post system, the other
+on FedEx, and so on. Each of these require a certain integration point
+from the web shop.
+</p>
+
+<div id="outline-container-org80cb5be" class="outline-2">
+<h2 id="_customization_versus_configuration">Customization versus configuration</h2>
+<div class="outline-text-2" id="text-_customization_versus_configuration">
+<p>
+One way to do this is to <i>customize</i> the software: produce a different
+version of the software that caters to this particular customer
+installation, using its specific shipping system integration. This
+alteration is done at the development pipeline, creating a new product
+instance, where the core behaviour is significantly changed. This custom
+version cannot be used for other customers, nor is the same version as
+the baseline anymore. The custom behavior is built into the software,
+it's not something you can swap out at whim.
+</p>
+
+<p>
+While the term <i>customization</i> loosely means making the product behave
+differently, in this context I specifically use to mark the "customized"
+product as a derivative one. That strikes a difference between
+<i>configuration</i>: a configurable product gets its custom behavior derived
+from configuration, a set of parameters that determine the application
+behavior that are <i>external</i> to the application. The part producing the
+custom behavior is outside the application.
+</p>
+
+<p>
+The part where car analogies in software tend to ultimately fall apart
+is software is not a physical medium. A binary does have a size, but
+whether the package is 100MB vs 1GB is largely irrelevant these days. As
+such, shipping a multitude of features such as shipping system
+integrations inside the same product does not dramatically alter the
+size of the deployable program.
+</p>
+
+
+<figure>
+<img src="file:///images/locomotive.jpg" alt="locomotive.jpg">
+
+<figcaption><span class="figure-number">Figure 1: </span>Talk about configurability!</figcaption>
+</figure>
+
+<p>
+Although clumsy, the seat selection analogy works well here. A
+customizable car has one of two choices, leather or fake leather. The
+customer gets a car with one or the other. If the customer were to
+change their mind, they'd be forced to return to the supplier to get
+them refitted. On the other hand, if one were to ship a <i>configurable</i>
+car, one would ship two seat sets with the car and an option to get them
+swapped at minimal cost. But the customer needs to find a place for the
+secondary seat set.
+</p>
+
+<p>
+As said before, car analogies stop working at this point when talking
+about software. The secondary seat set might be a couple of megabytes or
+tens of megabytes in the binary size. The <i>logistics</i> of the additional
+feature set are close to non-existent.
+</p>
+
+<p>
+Since software is not really a physical medium, a software delivery
+could just ship both seat sets and be done with it. Flip a switch off an
+enumeration to choose between seat styles. Or shipping system
+integrations.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org134c701" class="outline-2">
+<h2 id="_a_big_blob">A big blob?</h2>
+<div class="outline-text-2" id="text-_a_big_blob">
+<p>
+A configurable software system has the custom features live inside the
+same space as all the rest. Compare this to a customizable system where
+different versions have different features. A version for customer <i>A</i>
+has different modules available to it, since the modules for customer
+<i>B</i>'s requirements are not there. Underneath, it is mounted on top of
+the <i>baseline system</i>, where the standard product features come from.
+Both versions <i>A</i> and <i>B</i> have to now track changes in the baseline
+system, and this can be logistically challenging, as it tends to
+engender complicated release management and version control processes.
+</p>
+
+<p>
+In a configurable system there is no need for complex logistics: simply
+put all the features in the same binary, and ship the product with the
+necessary features enabled and the unnecessary or impossible ones
+disabled. Customer <i>A</i> chooses a different subset than customer <i>B</i>, but
+they are subsets of the same set nonetheless.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org96a10b8" class="outline-2">
+<h2 id="_death_to_customization_product_lines">Death to customization product lines!</h2>
+<div class="outline-text-2" id="text-_death_to_customization_product_lines">
+<p>
+Configurability is the antithesis of customization product lines.
+Customization produces derivative products that are distinct: parts may
+be removed, overwritten, or altered. In configuration, instead of
+removing, we disable. Instead of overwriting behavior, we choose another
+implementation. To alter, we do the same.
+</p>
+
+<p>
+The logistical problem of customization management does not vanish but
+takes another form: configuration management. How do create a product
+line that can take a rich product and trim the cruft to ship the
+versions that are needed? The product team should not have to waste time
+with a steam locomotive control panel with dozens of switches and gears
+to deploy the products to customers!
+</p>
+
+<p>
+As the previous article dealt with the issue of managing product lines
+for customizations, we now enter face the problem of configuration
+management! Imagine for a second that the web shop system has now on top
+of its shipping system integration <i>ten other</i> places to connect to,
+from product catalogs to order management systems to workforce
+management to billing. How do we make sure we can deliver versions of
+the product with the <i>right</i> set of settings, the correct integrations
+and so on?
+</p>
+
+<p>
+The obvious answer is that this requires an extremely user-friendly
+interface. I don't mean a graphical one! Even a configuration file with
+a nice, clear syntax <i>with good documentation</i> is more than enough.
+Ideally, the configuration system should be something that is fairly
+abstract. If you don't want to deal with YAML or JSON or properties
+files, you shouldn't have to. The configuration system must produce some
+sort of configuration and it shouldn't matter where this comes from. So
+even the origin of the configuration must be configurable!
+</p>
+
+<p>
+Aside from graphical interfaces, which face link:{% post<sub>url</sub>
+2018-09-16-the-runtime-configuration-problem %}[issues of their own],
+there are lots of ways for creating user-friendly configuration
+interfaces. Over the years I've grown fond of
+<a href="https://github.com/lightbend/config">Typesafe Config</a>, but plain
+YAML, TOML or INI files will do in a pinch.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc1e1803" class="outline-2">
+<h2 id="_configuration_is_flexible">Configuration is flexible</h2>
+<div class="outline-text-2" id="text-_configuration_is_flexible">
+<p>
+A configurable system has the downside that the settings need to be
+managed. Flexible, lightweight configuration management is still an
+unsolved problem, I think. That doesn't mean configuration is the
+solution to customization needs. On the contrary, it is a much better
+solution than any sort of derivative or "custom" software product line
+we've seen so far, but the implication is the requirement for
+configuration management.
+</p>
+
+<p>
+While the baseline codebase becomes large, as the custom requirements
+are bundled there, managing a large "monorepo" for a single product is
+usually easier than having separate code repositories. There are lots of
+ways to try to overlay customizations on top of a baseline version, but
+I've found them all wanting.
+</p>
+
+<p>
+So in the end, if I were to ship a web shop with integrations towards
+many shipping systems, I'd create a system where I can choose that for
+customer X, they get a certain set of integrations, and the other
+customer gets a different set. But the good part is that I can <i>control</i>
+how this happen without having to install a special product line or team
+that manages customizations. This is a much better alternative than
+creating custom derivatives.
+</p>
+
+<p>
+Where do we go from here? So now I've closed the idea of creating
+customization product lines, but now I'm faced with an entirely new
+problem: configuration management! This is an entirely separate problem,
+which deserves a post of its own, so stay tuned!
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<hr><address>Last modified on 20 March 2019. Content licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.
+</div>
+
+</div></body>
+</html>
