@@ -1,11 +1,9 @@
 #+TITLE: Antoine Kalmbach
 #+OPTIONS: html-preamble:nil
 
-@@html:<div class="row"><div class="col-sm-10 mx-sm-auto">@@
 #+BEGIN_index
 
 #+INCLUDE: "posts.org"
 
 #+END_index
 
-@@html:</div></div>@@

@@ -23,7 +23,8 @@
 #+OPTIONS: html-preamble:nil
 
 @@html:<h4>@@ 2016 @@html:</h4>@@ 
- @@html:<ul>@@@@html:<li>@@ [[file:posts/web-development-weird.org][Web development has become weird]] @@html:<span class="text-muted">@@ 25 October @@html:</span>@@ @@html:</li>@@
+ @@html:<ul>@@@@html:<li>@@ [[file:posts/half-stack-web-frameworks.org][Half stack web frameworks]] @@html:<span class="text-muted">@@ 02 November @@html:</span>@@ @@html:</li>@@
+@@html:<li>@@ [[file:posts/web-development-weird.org][Web development has become weird]] @@html:<span class="text-muted">@@ 25 October @@html:</span>@@ @@html:</li>@@
 @@html:<li>@@ [[file:posts/communicators-functional-actors.org][Communicators: actors with purely functional state]] @@html:<span class="text-muted">@@ 14 October @@html:</span>@@ @@html:</li>@@
 @@html:<li>@@ [[file:posts/focus.org][Focus]] @@html:<span class="text-muted">@@ 25 March @@html:</span>@@ @@html:</li>@@
 @@html:<li>@@ [[file:posts/imprecision-and-abstraction.org][Imprecision and abstraction]] @@html:<span class="text-muted">@@ 17 March @@html:</span>@@ @@html:</li>@@
