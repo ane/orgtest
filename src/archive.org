@@ -2,7 +2,8 @@
 #+OPTIONS: html-preamble:nil
 
 @@html:<h4>@@ 2019 @@html:</h4>@@ 
- @@html:<ul>@@@@html:<li>@@ [[file:posts/emacs-and-org.org][Using Emacs and Org to publish a blog]] @@html:<span class="text-muted">@@ 20 March @@html:</span>@@ @@html:</li>@@
+ @@html:<ul>@@@@html:<li>@@ [[file:posts/software-customization.org][Software customization is really hard]] @@html:<span class="text-muted">@@ 01 April @@html:</span>@@ @@html:</li>@@
+@@html:<li>@@ [[file:posts/emacs-and-org.org][Using Emacs and Org to publish a blog]] @@html:<span class="text-muted">@@ 20 March @@html:</span>@@ @@html:</li>@@
 @@html:<li>@@ [[file:posts/configurability.org][Configurability]] @@html:<span class="text-muted">@@ 14 March @@html:</span>@@ @@html:</li>@@
 @@html:<li>@@ [[file:posts/pieru.org][Shit head]] @@html:<span class="text-muted">@@ 10 March @@html:</span>@@ @@html:</li>@@@@html:</ul>@@
 #+TITLE: Archive

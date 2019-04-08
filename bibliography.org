@@ -1,0 +1,31 @@
+#+TITLE: Bibliography
+
+* Software Reuse: Architecture, Process and Organization for Business Success
+:PROPERTIES:
+:BTYPE:    book
+:AUTHOR:   Ivar Jacobson and Martin Griss and Patrik Jonsson
+:YEAR:     1997
+:PUBLISHER: ACM
+:ISBN:     0-201-92476-5
+:CUSTOM_ID: jacobson1997
+:END:
+
+* Software product line engineering: foundations, principles and techniques
+:PROPERTIES:
+:TITLE:    Software product line engineering: foundations, principles and techniques
+:BTYPE:    book
+:CUSTOM_ID: pohl2005software
+:AUTHOR:   Pohl, Klaus and B{\"o}ckle, G{\"u}nter and van Der Linden, Frank J
+:YEAR:     2005
+:PUBLISHER: Springer Science \& Business Media
+:END:
+
+* Software product lines: Practices and Patterns
+:PROPERTIES:
+:TITLE:    Software product lines: Practices and Patterns
+:BTYPE:    book
+:CUSTOM_ID: clements2002software
+:AUTHOR:   Clements, Paul and Northrop, Linda
+:YEAR:     2002
+:PUBLISHER: Addison-Wesley
+:END:

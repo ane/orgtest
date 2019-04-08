@@ -1,0 +1,1112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-04-08 Mon 16:42 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Software customization is really hard</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Antoine Kalmbach" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Software customization is really hard</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#_on_palimpsests">1. On palimpsests</a></li>
+<li><a href="#_efficiency_is_paramount">2. Efficiency is paramount</a></li>
+<li><a href="#_inheritance_is_not_a_solution">3. Inheritance is not a solution</a></li>
+<li><a href="#_plug_ins_are_not_a_panacea">4. Plug-ins are not a panacea</a></li>
+<li><a href="#_a_strong_reference">5. A strong reference</a></li>
+<li><a href="#_reintegration">6. Reintegration</a></li>
+<li><a href="#_no_easy_wins">7. No easy wins</a></li>
+<li><a href="#_towards_a_software_customization_framework">8. Towards a software customization framework</a></li>
+<li><a href="#_conclusion">9. Conclusion</a></li>
+<li><a href="#_references">10. References</a></li>
+</ul>
+</div>
+</div>
+<p>
+<div class="float-sm-right third ml-sm-3">
+</p>
+
+
+<div id="org7e764d8" class="figure">
+<p><img src="../assets/images/cust0.png" alt="cust0.png" />
+</p>
+<p><span class="figure-number">Figure 1: </span>Two custom versions of the same product. Color and shape are used to illustrate differences.</p>
+</div>
+
+<p>
+</div>
+</p>
+
+<p>
+I have been thinking long and hard about how to do software customization
+properly at a software architecture level. I don't want to claim that I have
+figured things out, but I offer what I think is a reasonably abstract solution,
+if that makes sense. I will detail my findings below, but first let's start by
+understanding the <i>problem</i>.
+</p>
+
+<p>
+The <i>primary</i> goal of software customization is to <i>satisfy the needs of its
+users</i>. This means implementing their requirements into the product.  The
+<i>secondary</i> goal is to do this efficiently. Needless repetition is what
+characterizes a bad software product line. <a href="#org7e764d8">Figure 1</a> illustrates this problem:
+two teams are building a similar twice from scratch.
+</p>
+
+<p>
+Customization is, at heart, modification. By modifying a certain basic version
+of a product, one creates a <i>new</i> product that behaves differently, works
+differently, looks different&#x2014;it's not the same product anymore.
+</p>
+
+<p>
+The extent and size of modifications defines the difficulty of customization. A
+product can be easily customizable for different reasons. The modifications
+required to build a custom product might be small. Or there might be a lot of
+them, but they are easy to implement.  It's not always a game of numbers.
+</p>
+
+<p>
+When creating a custom product, we look back to what we are customizing.  The
+base product that requires modification is a <i>baseline</i> product.  This baseline
+product establishes the <b>reference implementation</b> from which we create custom
+products. The modifications, when split into discrete parts, are
+<i>customizations</i>. Together, a <i>customized reference</i> is a <i>custom version</i> or a
+<i>custom product</i>.
+</p>
+
+<p>
+<div class="float-sm-right third ml-sm-3">
+</p>
+
+
+<div id="org36ae98a" class="figure">
+<p><img src="../assets/images/cust1.png" alt="cust1.png" />
+</p>
+<p><span class="figure-number">Figure 2: </span>Repetition can indicate the need for a reference product.</p>
+</div>
+
+<p>
+</div>
+</p>
+
+<p>
+From a product management perspective, the reference is <i>a</i> product.  Yet, from
+a business perspective, nobody sells a reference product.  Customers always
+require some modifications, and won't accept an unmodified reference
+implementation. So what is the business value of the reference? Is there any
+value in keeping it alive? Why not always do custom versions from scratch?
+</p>
+
+<p>
+The answer is <i>scale</i>. It depends. If the deliverable units are small, then it
+might actually be easier to do complete customization. This approach will
+eventually prove unscalable: there comes a limit where it is more advantageous
+to start sharing technology by establishing a reference implementation. Figure
+<a href="#org36ae98a">2</a> shows a situation where there are parallel teams building the
+same product in isolation.
+</p>
+
+<p>
+Sometimes it is wise to go fully custom, even with a lot teams. If the teams are
+small and building different things, it is natural, since the things they build
+are not related. There can always be some technology sharing in such a
+scenario. If, however, the units are building the same thing with slight
+differences, breaking the development process into a reference implementation
+makes sense. This is often the case in product development, so it is also the
+case in which I will focus here. Let's ignore the cases where the products are
+different, like in Figure <a href="#orgecfeee8">3</a>.
+</p>
+
+<p>
+From an engineering perspective, the biggest challenge in customization is how
+to keep the reference clean. Nobody wants to have customization artifacts, the
+customizations themselves, sticking out jaggedly in the code. It is much more
+advantageous to have a plug-in approach, whereby the architecture isolates
+customizable units in such a way that it does not make the product
+inflexible. If the code looks like it's full of switches and toggles for
+customizationz the code can be really hard to reason about and maintain.
+</p>
+
+<p>
+<div class="float-sm-right third ml-sm-3">
+</p>
+
+
+<div id="orgecfeee8" class="figure">
+<p><img src="../assets/images/custom5.png" alt="custom5.png" />
+</p>
+<p><span class="figure-number">Figure 3: </span>Establishing a reference product can be hard if the versions aren't alike.</p>
+</div>
+
+<p>
+</div>
+</p>
+
+<p>
+On the other hand, customization has to be efficient. Most of the effort in the
+product development process should <b>always</b> be in the reference product. The
+customizations come later, they are modifications, they are not a new
+product. If a product team spends more time in producing the user-facing custom
+versions than the actual reference product, this says that there are a lot of
+issues with the architecture.
+</p>
+
+<div id="outline-container-org166c2ca" class="outline-2">
+<h2 id="_on_palimpsests"><span class="section-number-2">1</span> On palimpsests</h2>
+<div class="outline-text-2" id="text-_on_palimpsests">
+<p>
+When I think of customization gone wrong, I think of the word
+<i>palimpsest</i>. Palimpsest derives from Ancient Greek <i>palímpsēstos</i>, meaning
+"again scraped". Palimpsests were manuscript pages created by erasing them so
+that they could be reused for writing new documents.  Palimpsests were feasible
+when the raw material for parchment was expensive. It was more economical to
+erase and reuse a piece of parchment than getting new parchment.
+</p>
+
+<p>
+A palimpsest is eerily similar to a failed software customization process. In a
+failed customization, the reference is written over to create a custom
+product. This is not efficient. If the reference product is developed in
+parallel by a separate team, every time they introduce a new feature, the
+customizing team is impacted. They must either figure out how to bring this new
+feature in the custom product, or worse, remove it entirely. Either way, this is
+<i>negative</i> work: work is done to <i>undo</i> work done by others.
+</p>
+
+<p>
+This inefficiency will eventually sink the teams. For every new feature
+potentially a new <i>anti-feature</i> is made. In an ideal development process,
+reference features flow seamlessly in the custom versions. It does not create
+conflicts.
+</p>
+
+<p>
+<div class="float-sm-right third ml-sm-3">
+</p>
+
+
+<div id="org5e678ab" class="figure">
+<p><img src="../assets/images/custom1.png" alt="custom1.png" />
+</p>
+<p><span class="figure-number">Figure 4: </span>Overwritten custom versions of a reference product (grey).</p>
+</div>
+
+<p>
+</div>
+</p>
+
+<p>
+Overwriting is particularly prominent in version control customization.
+Customization using version control, also known as <i>branching</i> or <i>forking</i>, is
+antithetical to the idea of proper customization. I find that most
+branching-based customization is just overwriting existing functionality, as
+seen in Figure <a href="#org5e678ab">4</a>.
+</p>
+
+<p>
+What is more, people don't <i>want</i> to do branching customization but they're
+often <b>forced</b> to, because the software wasn't designed for customization from
+the get-go. The is the heart of the issue. it is important to design for
+customization from the beginning. You cannot add it later.
+</p>
+
+<p>
+It's now obvious that the product should be designed to be <i>extended</i> so that no
+part is is overwritten. Parts can be replaced, added, removed or altered. The
+customization process should feel like drawing on an outline, instead of using
+an eraser to blank a canvas to draw something new.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6b12324" class="outline-2">
+<h2 id="_efficiency_is_paramount"><span class="section-number-2">2</span> Efficiency is paramount</h2>
+<div class="outline-text-2" id="text-_efficiency_is_paramount">
+<p>
+So the goal is to be able to maintain and develop a reference product <i>and</i> the
+custom versions. This process should be as efficient as possible. There should
+be zero rewriting. Most of the time should be spent on <i>installing</i> the
+customizations. This part of the customization I call <i>wiring</i>.
+</p>
+
+<p>
+There are many ways to do wiring. One of the easiest, and probably the least
+complicated solution, is to use plain if statements to toggle custom logic. The
+switches are turned on or off using run-time configuration. The application
+reads the configuration at run-time and determines its behavior based on the
+configuration.
+</p>
+
+<p>
+At this point I have to make a distinction between configuration and
+application. It is easy to overlook but the detail is important.  Configuration
+is something that's metadata which governs the behavior of an application, the
+application itself is an implementation of the behavior. I won't specify any
+particular medium for configuration, it can be text files, databases, a remote
+server. The important part is that it is somehow structured and human-readable,
+and that it can <b>alter the application behavior</b>.
+</p>
+
+<p>
+Configuration alone isn't going to solve the problem. Programming the
+customizations into the reference product and selecting them at run-time makes
+the product bigger. A larger product is harder to maintain.
+</p>
+
+
+
+<p>
+ditaa::<sub>images</sub>/custom6.ditaa[format=svg,separation=false]
+</p>
+
+<p>
+<div class="float-sm-right third ml-sm-3">
+</p>
+
+
+<div id="orgc16ee17" class="figure">
+<p><img src="../assets/images/custom6.png" alt="custom6.png" />
+</p>
+<p><span class="figure-number">Figure 5: </span>Custom versions (A, B, C) are just subsets of a large reference product.</p>
+</div>
+
+<p>
+</div>
+</p>
+
+<p>
+So what is it then? By now it is apparent that customizations should not
+overwrite existing functionality, the reference product should lend itself to
+extension. On the other hand, piling customizations together and selecting a
+subset of them to create a custom version can make the product really big. What
+if there are five different implementations of the same reference functionality,
+and this is true for five other features? Now you have 25 permutations to choose
+from!  Figure <a href="#orgc16ee17">5</a> illustrates a big reference product.  Customs
+versions originate from subsets of a large reference.
+</p>
+
+<p>
+Different languages give different tools for doing customization tricks.
+Perhaps the most basic one of them after branching logic&#x2014;​if's and else's&#x2014;​is
+trying to use inheritance from object oriented programming.
+</p>
+
+<p>
+You <b>really</b> don't want to do customization using inheritance.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org98d249d" class="outline-2">
+<h2 id="_inheritance_is_not_a_solution"><span class="section-number-2">3</span> Inheritance is not a solution</h2>
+<div class="outline-text-2" id="text-_inheritance_is_not_a_solution">
+<p>
+Another troublemaker is to use inheritance from object-oriented programming to
+do customization. This is extremely dangerous because it doing so tends to break
+the <a href="https://en.wikipedia.org/wiki/Liskov_substitution_principle">Liskov substitution principle</a>. With inheritance, customization is created by
+overriding behavior in a reference class. While this makes sense for simple
+behavioral subtyping scenarios, where an abstract entity is <i>implemented</i> using
+inheritance, the customization approach tends to inherit the <i>implementation</i>,
+providing the custom implementation.
+</p>
+
+<p>
+This is particularly harmful because the Liskov substitution principle asserts
+that if \(q(x)\) is a property provable about objects \(x\) of type \(T\), then \(q(y)\)
+should be provable for objects \(y\) of type \(S\), where \(S\) is subtype of
+\(T\).<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>
+</p>
+
+<p>
+To paraphrase Wikipedia, this means that objects of type \(T\) should be
+replaceable by objects of type \(S\), without altering the behavior of the
+program. In the principle any \(S\) behaves the same way as any \(T\).  Substituting
+one with the other has no overall effect on the program.
+</p>
+
+<p>
+This is where the principle collides with inheritance-based customization. The
+whole point of customization is to alter program behavior, using inheritance to
+do customization decidedly violates the substitution principle!
+</p>
+
+<p>
+Of course it is possible to ignore the principle, but to me, it is a valuable
+property of any object-oriented design. By obeying the principle, we gain
+composability, since we can replace any \(T\) with a \(S\), and we can expect the
+same invariants to hold. To me, behavioral subtyping is the <i>only</i> principle of
+object-oriented programming that makes sense and is useful.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf261df3" class="outline-2">
+<h2 id="_plug_ins_are_not_a_panacea"><span class="section-number-2">4</span> Plug-ins are not a panacea</h2>
+<div class="outline-text-2" id="text-_plug_ins_are_not_a_panacea">
+<p>
+Let's address the elephant in the room. By now, astute readers might have
+guessed that the we should be using modules and build a <i>plug-in architecture</i>
+to get easy customization.
+</p>
+
+<p>
+A plug-in architecture is obviously <i>a</i> solution to customization. The process
+is as follows. We take the core product and inspect it and determine parts that
+are customizable. We then build the product in such a fashion that swapping out
+these parts is easy. Each part has alternatives, at least one.
+</p>
+
+<p>
+In engineering lingo, these parts are <i>modules</i>, and a product engineered like
+this is a <i>modular</i> product. The idea is to have a mechanism that can support
+different implementations of the same thing, built in such a way that the
+changing of implementations is easy.
+</p>
+
+<p>
+To create a customized version, we take the core product and choose our set of
+parts. A custom version, voilà ! Now the customization process becomes a
+part-picking experience, by taking features off the shelf.
+</p>
+
+<p>
+The reality is <i>somewhat</i> darker than this. By emphasizing <i>somewhat</i> I mean <i>a
+lot</i> darker than this. The preceding paragraphs described the <i>ideal</i> scenario
+of a modular architecture.
+</p>
+
+
+<div class="figure">
+<p><img src="emmental.jpg" alt="emmental.jpg" />
+</p>
+<p><span class="figure-number">Figure 6: </span>Emmental cheese.</p>
+</div>
+
+<p>
+Building modularity properly is <i>tremendously</i> difficult. You not only have to
+plan for the <i>known</i> use cases&#x2014;​the custom scenarios&#x2014;​you also have to plan
+for the <i>unknown</i> use cases. If your universal interface stops working because
+you didn't consider a case where the customization explicitly requires
+<i>non-universality</i>, tough shit! Maybe you didn't enforce the Liskov substitution
+principle, and your messaging system was co-opted into a customer profiling
+engine, and then the GDPR kicked in, and now your data protection officer wants
+a word with you!
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga56dff8" class="outline-2">
+<h2 id="_a_strong_reference"><span class="section-number-2">5</span> A strong reference</h2>
+<div class="outline-text-2" id="text-_a_strong_reference">
+<p>
+A rather typical nightmare scenario is that the reference is like a block of
+Emmental, only the holes are too big, or there are too many of them. This is
+usually a symptom of insufficient reference engineering, that is, the reference
+is not given the attention it deserves. This is the <i>thin reference</i>
+scenario. In the thin reference scenario, the reference is not a viable product,
+because the customizations, not the reference itself, received the brunt of
+engineering focus.
+</p>
+
+<p>
+It is often the case that the reference product is never a viable product, but
+it should be viable <i>enough</i>. The reference needs to be concrete enough to build
+a model of what the application is.  <code>LINK TO CUSTOM</code> illustrates a modular
+architecture where most of the implementation is in the modules. While this
+approach can be viable, if the modules lack strong defaults, it might be hard to
+say what the reference does.
+</p>
+
+<p>
+<b>An extremely modular architecture..</b>
+</p>
+
+<p>
+ditaa::<sub>images</sub>/custom7.ditaa[format=svg,separation=false]
+</p>
+
+<p>
+If the reference implementations of the modules are poorly done or unusuable, it
+will be hard to say what the reference product does. This makes customization
+difficult, since the only actual product instances are the customized ones. This
+creates an awkward situation where the reference serves no purpose but to act as
+a <i>template</i> for customizations, but the reference isn't a template!
+</p>
+
+<p>
+A strong reference product is also useful for quality purposes. If any module
+has a reference implementation, the custom implementation can be <i>verified</i>
+against the reference implementation. If the reference implementation doesn't
+exist, one must implement new quality checks for the custom implementation.
+</p>
+
+<p>
+Having a strong reference will prove problematic when the reference is extremely
+modular. A modular architecture <i>enables</i> customization. A modular architecture
+isn't a goal in itself. The problem with an extremely modular architecture is
+you now need to maintain a reference product. That can get onerous if the amount
+of modularity is large, because now every customizable module has to be built
+and validated twice.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf2133f1" class="outline-2">
+<h2 id="_reintegration"><span class="section-number-2">6</span> Reintegration</h2>
+<div class="outline-text-2" id="text-_reintegration">
+<p>
+Organizing the customization into a smaller set of modules makes
+maintaining the modular architecture easier. If we rearrange the modules
+of <code>LINK TO CUSTOM7</code> and group them together as a
+customization layer, we get something like <code>LINK TO CUSTOM8</code>. The idea is to organize the architecture
+into the static, non-customizable parts into a separate unit, and the
+customizable part as the customizable unit.
+</p>
+
+<p>
+*Visualizing the customizations as extensions on top of a base layer.
+This is most likely not how the customizations are organized
+concretely..*
+</p>
+
+<p>
+ditaa::<sub>images</sub>/custom8.ditaa[format=svg,separation=false]
+</p>
+
+<p>
+In <code>LINK TO CUSTOM9</code> we see that the area marked <i>Default</i>
+is the reference implementation of the customization part. The
+architecture is now easier to understand from this picture. Customizable
+plugin belong to the customizable layer and the non-customizable parts
+are in the static layer.
+</p>
+
+<p>
+<b>Identifying a reusable part..</b>
+</p>
+
+<p>
+ditaa::<sub>images</sub>/custom9.ditaa[format=svg,separation=false]
+</p>
+
+<p>
+It is a question of architectural <i>taste</i> how big the customizable area
+of the product should be. Some applications like
+<a href="https://www.eclipse.org">Eclipse</a> are completely<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> modular. The
+inverse of a completely modular architecture is an non-modular
+architecture. By now it is clear that a non-modular architecture is not
+good for customization. On the other hand, when working with a totally
+modular architecture, if the development team is willing to put with
+maintaining a strong reference product <i>and</i> separate custom versions, a
+totally modular architecture might be fine.
+</p>
+
+<p>
+<b>Static reintegration. X is made a standard extension..</b>
+</p>
+
+<p>
+ditaa::<sub>images</sub>/custom10.ditaa[format=svg,separation=false]
+</p>
+
+<p>
+Sometimes customizations can be seen as reusable assets that should
+exist in <i>all</i> versions, in the reference product. This is the
+<i>reintegration</i> process where custom features are made a part of the
+reference product. There are two approaches to reintegration. Once the
+reusable part is identified in a customization (see
+<code>LINK TO CUSTOM10</code>), we can choose whether it should be a
+<i>global</i> customization. A global customization means that this is a
+customization point in every version. So the feature is made a module in
+the reference and custom versions (<code>LINK TO CUSTOM11</code>).
+</p>
+
+<p>
+What if the feature is not seen as a customization, just as a feature
+that should be made a static part of the reference? In this case we make
+the feature a non-customizable part of the reference product, as seen in
+<code>LINK TO CUSTOM10</code>. This is the static extension process:
+a custom asset, from a custom version, is made part of the reference
+product. This happens when the customization is not really a
+customizable thing, it's something every instance of the product
+benefits from.
+</p>
+
+<p>
+<b>Static reintegration. X is made a non-custom part of the reference..</b>
+</p>
+
+<p>
+ditaa::<sub>images</sub>/custom11.ditaa[format=svg,separation=false]
+</p>
+
+<p>
+The problem with reintegration is the architecture might not allow to do
+any of this. The extraction of the reusable part might be impossible
+(<code>LINK TO CUSTOM10</code>) because the feature too tightly
+coupled to the customized product. It might also be impossible to bring
+new features into the reference product because it wasn't built to
+support static extension. This forces the hand of the design to try the
+global customization approach.
+</p>
+
+<p>
+Any of the aforementioned scenarios are time-consuming and risky
+solutions to an underlying design failure. These scenarios are symptoms.
+They are artifacts of a design process gone wrong. The architectural
+design of the product has failed.
+</p>
+
+<p>
+Perhaps the most important part of customization is to <i>design</i> for it,
+to anticipate it. But that's the hardest part of all!
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3ff9cff" class="outline-2">
+<h2 id="_no_easy_wins"><span class="section-number-2">7</span> No easy wins</h2>
+<div class="outline-text-2" id="text-_no_easy_wins">
+<p>
+The unfortunate truth is that you can always prepare for customization
+but you can never prepare for it perfectly. Either one is <i>too</i> prepared
+with an over-engineered product or one is not prepared enough. These are
+the usual judgments laid a posteriori of a customization scenario.
+</p>
+
+<p>
+I have observed that we are just as likely to over-engineer than to
+under-engineer. This factoid is based on my idea that people tend to
+place too much emphasis on the things they <i>do</i> know and too little
+emphasis on the things that they <i>don't</i> know, and these estimation
+errors tend to be usually equal in measure. The things that we do know
+characterize our design with a vision of "holes" or "modules", the
+actual customization points, and the things that we don't know <i>add</i> new
+places for these modules.
+</p>
+
+<p>
+Each step towards implementing a requirement, a product feature, always
+creates an inflexibility of sorts. After all, a product is the sum of
+the features. To create a customizable feature, one must imagine the
+product with the feature removed or significantly altered. Omit <i>that</i>
+step, and you will have a difficulty customizing it!
+</p>
+
+<p>
+But this step can be taken to extremes. Exercising caution when planning
+for customization is necessary, because over-engineering a product for
+customizations delays the time to market. Creating a minimum viable
+product will take significantly longer by planning too much for
+customization. The flip side is that under-engineering makes
+customization difficult, because you're forced to take the product apart
+and redesign for customization.
+</p>
+
+<p>
+It varies on a case-by-case basis which one takes the least time or
+other resources. If you don't over-engineer <i>too much</i>, your investment
+might pay off in the end, since adding new features will be easy.
+Conversely, going over the top might have made the product too
+expensive.
+</p>
+
+<p>
+I have observed some heuristical approaches towards finding a good
+synthesis. One of them is a rule of thumb to never build customization
+on the first iteration. Then on the second instance, when the
+customization becomes necessary, customizability is added. I think this
+is a very Brutalist approach, but it is feasible, if the process is done
+correctly. It eliminates the risk for over-engineering customization,
+but it creates a need for effort when the customization is necessary. It
+is obvious that this heuristic is only feasible when the planned
+customization requirements aren't certain. If they're certain, this
+approach is harder to justify.
+</p>
+
+<p>
+By now I would say that the question of how much engineering should be
+done towards customization depends on the following factors:
+</p>
+
+<ol class="org-ol">
+<li>The size and scope of the product itself. What is the product, what
+does it do?</li>
+
+<li>The size and scope of the customizations. What can be customized? How
+hard is it do a customization?</li>
+
+<li>The foreseeable necessity of customizations. How is going to be
+customized, if at all?</li>
+</ol>
+
+<p>
+And therefore it's necessary to evaluate all three carefully before
+choosing the right amount of customization. But there's no universal
+heuristic. You always aim too high or too low. This may sound a little
+fatalistic, but I think it's possible to improve the accuracy of this
+process as one learns to estimate the above points.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org226b582" class="outline-2">
+<h2 id="_towards_a_software_customization_framework"><span class="section-number-2">8</span> Towards a software customization framework</h2>
+<div class="outline-text-2" id="text-_towards_a_software_customization_framework">
+<p>
+Programming languages in all their variety offer tons of techniques for
+building customizable software. From extensible classes to monkey
+patching to type classes and run-time class loading, there are many
+tools out there. I think the programming part of building
+customizability is just one part of the process, and while it's an
+important part, it's not the only part, as you have probably read now.
+</p>
+
+<p>
+As I stated at the start, I'm not interested in offering an end-it-all
+solution or programming technique to tackle the issue of software
+customization. What I'm interested in is building a framework, in the
+methodology sense, towards doing customization. This post is just the
+beginning.
+</p>
+
+<p>
+That said, I'm not going to just write a post that is basically just a
+brain dump of the things that I find difficult on the topic. I said in
+the beginning that I have developed some rough ideas on how to address
+the issue of customization. This lays the groundwork on what the
+framework I mentioned above is going to solve.
+</p>
+
+<dl class="org-dl">
+<dt>A strong reference implementation is necessary</dt><dd>When building a
+product that is going to have multiple custom instances, it is
+important to have some sort of a reference to which the instances can
+be compared. Not only this makes quality assurance easier, because you
+can validate the instance against the reference, it also makes it
+easier to separate what is custom and what isn't. The reference
+product <i>is</i> the product itself, the custom instances are just
+extensions of it. Furthermore, custom instances can produce features
+that are desirable in the core product or other customizations, and
+the reference product is a channel for adding new features to the
+product.</dd>
+
+<dt>Identifying the necessity of customization</dt><dd>It is important to known
+in advance whether the product is going to have custom instances or
+not. This makes it easier to know which parts will require
+customization and which parts are more static. That said, it is often
+difficult to anticipate what parts will require customization. The
+architecture should be flexible enough to permit adding
+customizability as easily as possible. The architecture should also
+understand that some requirements may be missing entirely, so in one
+sense, the architecture must always anticipate some customization or
+redesigning.</dd>
+
+<dt>The quantity of architectural design</dt><dd>In anticipating the
+customizations, it is just as easy to over-engineer for <i>every</i>
+customization as it is to under-engineer for <i>no</i> customization. It
+can be said that for every known requirement for customization another
+<i>unknown</i> customization requirement is going to materialize
+eventually. Creating an overly composable, supremely modular
+architecture is not a good idea; conversely creating a rigid and
+static architecture is equally a bad idea. In my view, there are no
+universal heuristics on just how much is necessary. It requires
+judgment on a case-by-case basis, especially by taking the previous
+two points into account.</dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-org9b6d4aa" class="outline-2">
+<h2 id="_conclusion"><span class="section-number-2">9</span> Conclusion</h2>
+<div class="outline-text-2" id="text-_conclusion">
+<p>
+This post became <i>way</i> longer than I originally intended to. I
+originally wanted to present a particular customization technique using
+the tricks of one particular programming language and programming
+environment, but as it grew larger I wanted to give the topic a broader
+treatment. But this barely even scratches the surface. I have not even
+spoken on how to do customization in practice at all.
+</p>
+
+<p>
+I suppose at this point this post is a beginning in a series of longer
+ones, treating the individual elements of the previous list in a more
+profound manner. This is a very large topic in general, as it broaches
+fields from software architecture to product management to requirements
+engineering to actual programming.
+</p>
+
+<p>
+That is not to say I plan to devote the whole blog towards software
+product engineering, let alone write a book about it (though that would
+be interesting), but as I deal with these topics daily in my job, it's a
+very interesting topic <i>to me</i>. So interested readers can possibly
+expect more of the subject!
+</p>
+
+<p>
+These ideas are just materializations of my recurring thoughts while
+designing software products, and most of them are not new. A step in
+<i>any</i> direction is going to lead one towards what is known as <i>software
+product line engineering</i>, that is, recognizing that the creation of
+software <i>products</i> can be understood using <i>product lines</i>.
+</p>
+
+<p>
+Fundamentally, the art of customization is about software reuse. For a
+deeper introduction to the idea of reuse I recommend the book <i>Software
+Reuse: Architecture, Process and Organization for Business Success</i>
+cite:[jacobson1997]. From the concepts of <i>reuse</i> it is easy to make the
+transition to the idea of software product lines. A good introduction to
+the subject are the books <i>Software Product Lines: Practices and
+Patterns</i> cite:[pohl2005software], and <i>Software Product Line
+Engineering: Foundations, Principles and Techniques</i>
+cite:[clements2002software].
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga7a2a75" class="outline-2">
+<h2 id="_references"><span class="section-number-2">10</span> References</h2>
+<div class="outline-text-2" id="text-_references">
+<p>
+[<a href="#jacobson1997">2</a>]</p>
+
+<div id="bibliography">
+<h2>References</h2>
+
+<table>
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="clements2002software">1</a>]
+</td>
+<td class="bibtexitem">
+Paul Clements and Linda Northrop.
+ <em>Software product lines: Practices and Patterns</em>.
+ Addison-Wesley, 2002.
+[&nbsp;<a href="bibliography_bib.html#clements2002software">bib</a>&nbsp;]
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="jacobson1997">2</a>]
+</td>
+<td class="bibtexitem">
+Ivar Jacobson, Martin Griss, and Patrik Jonsson.
+ <em>Software Reuse: Architecture, Process and Organization for
+  Business Success</em>.
+ ACM, 1997.
+[&nbsp;<a href="bibliography_bib.html#jacobson1997">bib</a>&nbsp;]
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="pohl2005software">3</a>]
+</td>
+<td class="bibtexitem">
+Klaus Pohl, G&uuml;nter B&ouml;ckle, and Frank&nbsp;J van Der&nbsp;Linden.
+ <em>Software product line engineering: foundations, principles and
+  techniques</em>.
+ Springer Science &amp; Business Media, 2005.
+[&nbsp;<a href="bibliography_bib.html#pohl2005software">bib</a>&nbsp;]
+
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://en.wikipedia.org/wiki/Liskov_substitution_principle">Liskov
+substitution principle</a>. On Wikipedia, retrieved 7th April 2018.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://www.ibm.com/developerworks/library/os-ecplug/">Developing
+Eclipse plug-ins</a>, retrieved 11th April 2018.
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">Date: 2019-04-01 Mon 00:00</p>
+<p class="author">Author: Antoine Kalmbach</p>
+<p class="date">Created: 2019-04-08 Mon 16:42</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

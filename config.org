@@ -24,9 +24,9 @@ specific to the blog project only:
 
 This sets up two things whenever opening a file in the directory:
 
-- it sets up a keybinding for @@html:<kbd>F3</kbd>@@ to publish a project called
+- it sets up a keybinding for @@html:<kbd>C-x F3</kbd>@@ to publish a project called
   blog defined in =config.org=. It also enables a [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Command-Arguments.html][prefix argument]] for the
-  keybinding, so hitting @@html:<kbd>C-u F3</kbd>@@ clears all timestamp caches
+  keybinding, so hitting @@html:<kbd>C-u C-x F3</kbd>@@ clears all timestamp caches
   from org publish. This is useful if I want to regenerate the post index or
   archives, as those will defer to caches to get the titles and dates.
 - it sets a buffer-local variable =blog-root= used throughout the configuration

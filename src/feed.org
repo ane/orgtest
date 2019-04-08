@@ -1,128 +1,134 @@
 #+TITLE: Feed
 
+* [[file:/Users/akalmbach/code/kakka/src/posts/software-customization.org][Software customization is really hard]]
+:PROPERTIES:
+:RSS_PERMALINK: posts/software-customization.html
+:PUBDATE:  2019-04-01
+:ID:       36B43558-AAB7-46BF-A694-60AE94FD241E
+:END:
 * [[file:/Users/akalmbach/code/kakka/src/posts/emacs-and-org.org][Using Emacs and Org to publish a blog]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/emacs-and-org.html
 :PUBDATE:  2019-03-20
-:ID:       DBF141C6-56F0-4709-B219-021F227B497F
+:ID:       3D1FDE22-0084-484F-8CD3-C11B579C1041
 :END:
 I converted my blog from Jekyll to be published using Emacs and Org. To say it was an interesting endeavor is an understatement.
 * [[file:/Users/akalmbach/code/kakka/src/posts/configurability.org][Configurability]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/configurability.html
 :PUBDATE:  2019-03-14
-:ID:       F8599F62-8971-4705-9DD7-83D5790F3B8F
+:ID:       14D6DB3A-12DD-46B6-8DF3-78F4D0166FC5
 :END:
 Configurability brings inherent flexibility to software but it has its limitations.
 * [[file:/Users/akalmbach/code/kakka/src/posts/pieru.org][Shit head]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/pieru.html
 :PUBDATE:  2019-03-10
-:ID:       3D6E4AB9-8593-4570-A1B3-B44AC72DC44E
+:ID:       43D1F056-3465-4C7D-BD2B-CE2B18B0F5D8
 :END:
 Fort bort short hort.
 * [[file:/Users/akalmbach/code/kakka/src/posts/runtime-configuration-problem.org][The runtime configuration problem]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/runtime-configuration-problem.html
 :PUBDATE:  2018-09-16
-:ID:       B99E1B15-73C5-4913-B53F-1D3E8F77D00D
+:ID:       82C78865-392D-4BBF-86F2-195301BE348E
 :END:
 Configuring continuously running applications is a tricky problem.
 * [[file:/Users/akalmbach/code/kakka/src/posts/the-joy-of-asciidoc.org][The Joy of AsciiDoc]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/the-joy-of-asciidoc.html
 :PUBDATE:  2018-03-22
-:ID:       43960B66-43F1-4CC6-B129-2E62C1FCA329
+:ID:       75F2ADA6-BDE0-434B-99F1-9C1D5AAE3FE5
 :END:
 Converting this site from Markdown to AsciiDoc was not as easy as I thought.
 * [[file:/Users/akalmbach/code/kakka/src/posts/envisioning-a-new-tracing-system.org][Envisioning a new tracing system]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/envisioning-a-new-tracing-system.html
 :PUBDATE:  2018-03-21
-:ID:       41FA610D-CA0F-4648-A953-914C2D756202
+:ID:       860A73E7-A8FF-45AC-BFDB-6481CDA9B9F5
 :END:
 Distributed tracing is really hard.
 * [[file:/Users/akalmbach/code/kakka/src/posts/useless-interfaces.org][Useless interfaces]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/useless-interfaces.html
 :PUBDATE:  2017-03-23
-:ID:       319C6033-F69C-405D-98B2-8A34E9B9C689
+:ID:       F448E8EA-D202-4C62-BF44-0B624D4365E8
 :END:
 Sometimes explicit is better than implicit.
 * [[file:/Users/akalmbach/code/kakka/src/posts/implicit-power.org][Implicit power]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/implicit-power.html
 :PUBDATE:  2017-03-15
-:ID:       B67C3F33-D396-434D-999E-55EE98E12699
+:ID:       9A3A0FA5-3E7A-46EC-BAB7-42F79EA29894
 :END:
 How I managed to use all three kinds of Scala implicits in one bit of code.
 * [[file:/Users/akalmbach/code/kakka/src/posts/camel-abstractions.org][Apache Camel and the price of abstractions]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/camel-abstractions.html
 :PUBDATE:  2017-03-08
-:ID:       876E6AA0-F97F-4089-9756-3DE84407551C
+:ID:       3CD20EE2-47AF-4457-AD89-89FACFD4C2D9
 :END:
 There is always an inherent price in moving to a higher level of abstraction.
 * [[file:/Users/akalmbach/code/kakka/src/posts/half-stack-web-frameworks.org][Half stack web frameworks]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/half-stack-web-frameworks.html
 :PUBDATE:  2016-11-02
-:ID:       DBFED07A-5CBA-4A2D-A751-9028118701A5
+:ID:       CC541FBB-952F-46BB-92DA-3579F1F5FF23
 :END:
 A practical compromise to the conundrum introduced in the previous post.
 * [[file:/Users/akalmbach/code/kakka/src/posts/web-development-weird.org][Web development has become weird]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/web-development-weird.html
 :PUBDATE:  2016-10-25
-:ID:       5B598657-0EAF-4AB3-8485-7F59013A8C32
+:ID:       EB48CC02-FD8C-4511-A9E5-5E6687B3BD87
 :END:
 The title says it all.
 * [[file:/Users/akalmbach/code/kakka/src/posts/communicators-functional-actors.org][Communicators: actors with purely functional state]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/communicators-functional-actors.html
 :PUBDATE:  2016-10-14
-:ID:       D1A89DA1-3BF1-4060-ACA3-A8E9AEF53A25
+:ID:       083DA577-D2BA-4ECB-920D-C489152251EF
 :END:
 Mutable state is dangerous if used carelessly.
 * [[file:/Users/akalmbach/code/kakka/src/posts/focus.org][Focus]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/focus.html
 :PUBDATE:  2016-03-25
-:ID:       7710F7C1-A4C7-4DF8-B5B6-BB9CDA353831
+:ID:       BDEC8186-5D26-41B8-B9B2-718372285905
 :END:
 The focus or the essence of a programming language is often the lynchpin of its design.
 * [[file:/Users/akalmbach/code/kakka/src/posts/imprecision-and-abstraction.org][Imprecision and abstraction]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/imprecision-and-abstraction.html
 :PUBDATE:  2016-03-17
-:ID:       34D95922-C1B5-4CFB-B65C-C11A051E9CA6
+:ID:       CDB2C529-93C1-4722-B9A6-F328914D7487
 :END:
 Simplifications can sometimes make things harder to understand.
 * [[file:/Users/akalmbach/code/kakka/src/posts/are-my-services-talking-to-each-other.org][Are my services talking to each other?]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/are-my-services-talking-to-each-other.html
 :PUBDATE:  2016-01-26
-:ID:       DD4E9A40-37DF-4A4E-9E02-BF49BC4A8D22
+:ID:       D042BFB8-7D42-450A-BCBA-7F2E623DF60E
 :END:
 Distributed tracing is hard.
 * [[file:/Users/akalmbach/code/kakka/src/posts/the-expression-problem-as-a-litmus-test.org][The expression problem as a litmus test]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/the-expression-problem-as-a-litmus-test.html
 :PUBDATE:  2016-01-08
-:ID:       C579C077-4608-4299-B131-B8B69FDB4CF8
+:ID:       2E813BBC-7456-4443-BF8C-1906E6D14CDB
 :END:
 The expression problem can be seen as a way to measure the expressive power of a programing language.
 * [[file:/Users/akalmbach/code/kakka/src/posts/before-we-begin.org][Before we begin]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/before-we-begin.html
 :PUBDATE:  2016-01-01
-:ID:       5545E65D-D102-4856-8FBB-049EEB2D5F6F
+:ID:       E7BF1386-A1E0-4C93-9181-F5BF9754E6D0
 :END:
 It's not easy to write if your expectations are too high.
 * [[file:/Users/akalmbach/code/kakka/src/posts/start-once-software.org][Start-once software]]
 :PROPERTIES:
 :RSS_PERMALINK: posts/start-once-software.html
 :PUBDATE:  2015-12-07
-:ID:       BF32AA53-624E-45C1-A7D9-B537650AB5DF
+:ID:       31E5FDFF-7ECE-4417-BC44-C94799D4705E
 :END:
 Our development tools are transitioning away from batch oriented processing.

@@ -1,11 +1,13 @@
-((nil . ((eval . (setq-local
-                  blog-root
-                  (if buffer-file-name
-                      (file-name-directory
-                       (car (dir-locals-find-file (buffer-file-name))))
-                    default-directory)))
+((nil . ((eval . (setq-local blog-root (if buffer-file-name
+                                           (file-name-directory
+                                            (car (dir-locals-find-file (buffer-file-name))))
+                                         default-directory)))
+         (eval . (let ((bibfile (expand-file-name "blog.bib" blog-root)))
+                   (setq org-ref-default-bibliography bibfile)
+                   (setq bibtex-completion-bibliography bibfile)
+                   (setq org-bibtex-file (expand-file-name "bibliography.org" blog-root))))
          (eval . (local-set-key
-                  (kbd "<f3>")
+                  (kbd "C-x <f3>")
                   (lambda (arg)
                     (interactive "P")
                     (when arg

@@ -237,3 +237,37 @@ blockquote {
 .section-number-5:after {
     content: ".";
 }
+
+span.figure-number {
+    color: #6c757d;
+}
+
+#content h1,
+#content h2,
+#content h3,
+#content h4,
+#content h5,
+#content h6 {
+    margin-bottom: 0.75rem !important;
+}
+
+figcaption {
+    font-size: 85%;
+}
+
+#bibliography {
+    font-size: 90%;
+}
+
+#bibliography table {
+    border-spacing: 5px 10px;
+    border-collapse: separate;
+}
+
+td.bibtexnumber {
+    color: #006688;
+}
+
+.footpara {
+    display: inline;
+}
